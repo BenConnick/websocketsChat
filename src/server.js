@@ -15,7 +15,7 @@ const onRequest = (request, response) => {
   response.end();
 };
 
-const app = http.createServer(onRequest).listen(port);
+const app = http.createServer(onRequest).listen(port, "0.0.0.0");
 
 console.log(`Listening on 127.0.0.1: ${port}`);
 
