@@ -43,6 +43,7 @@
     		
     		// send message from the input element called message
     		const sendMsgFromInput = () => {
+				alert("hi");
     			// don't send emtpy message
     			if (message.value == "") return;
     			// send message with user name
@@ -57,6 +58,15 @@
     		// hook up send button
     		const send = document.querySelector("#send");
     		send.addEventListener('click',sendMsgFromInput);
+			
+			// send with enter key
+			window.addEventListener("keydown", (e) => {
+				switch(e.keyCode) {
+					case 13:
+						sendMsgFromInput();
+						break;
+				}
+			});
     	};
     	
     	const init = () => {
