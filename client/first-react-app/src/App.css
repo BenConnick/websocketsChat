@@ -1,17 +1,13 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+  
 }
 
 .App-header {
   background-color: #222;
-  height: 150px;
+  height: 50px;
   padding: 20px;
   color: white;
+  text-align: center;
 }
 
 .App-intro {
@@ -21,4 +17,20 @@
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+textarea {
+  display: block;
+  background-color: #EEEEEE;
+}
+.anim {
+  width: 1000px;
+  height: 1000px;
+  background-image: url("images/cat_idle.png");
+  animation: play .8s steps(7) infinite;
+}
+
+@keyframes play {
+   from { background-position:    0px; }
+   to { background-position: -7000px; }
 }

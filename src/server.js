@@ -1,13 +1,25 @@
-const http = require('http');
-const fs = require('fs');
-const socketio = require('socket.io');
+const express = require('express');
 
-//const htmlHandler = require('./htmlResponses.js');
-//const mediaHandler = require('./mediaResponses.js');
+const app = express();
+app.use(express.static('src/build'));
+const http = require('http').Server(app);
+const socketio = require('socket.io');
+// const url = require('url');
+const path = require('path');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
-const index = fs.readFileSync(`${__dirname}/../client/client.html`);
+// start server listen to all IPs on port
+http.listen(port, '0.0.0.0', 511, () => {
+  console.log(`listening on *: ${port}`);
+  // console.log(`Listening on 127.0.0.1: ${port}`);
+});
+
+// FILE SERVING HANDLED BY EXPRESS
+/*
+const port = process.env.PORT || process.env.NODE_PORT || 3000;
+
+const index = fs.readFileSync(`${__dirname}/build/index.html`);
 
 const onRequest = (request, response) => {
   response.writeHead(200, {'Content-Type': 'text/html'});
@@ -18,9 +30,17 @@ const onRequest = (request, response) => {
 const app = http.createServer(onRequest).listen(port, "0.0.0.0");
 
 console.log(`Listening on 127.0.0.1: ${port}`);
+*/
+
+// returns homepage
+app.get('/', (req, res) => {
+  // does not run, just returns index
+  console.log('root request recieved');
+  res.sendFile(path.resolve('src/build/index.html'));
+});
 
 // pass in the http server into socketio and grab the websocket server
-const io = socketio(app);
+const io = socketio(http);
 
 // object to hold all of our connected users
 const users = {};

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
@@ -7,12 +6,20 @@ class App extends Component {
     return (
       <div className="App">
         <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
+          <h2>Welcome to Meowssenger</h2>
         </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <br/>
+        <label htmlFor="user">Username:</label>
+        <input id="username" name="user" type="text"/>
+        <input id="connect" type='button' value='connect'/>
+        <br/>
+        <label htmlFor="message">Message:</label>
+        <input id="message" name="message" type="text"/>
+        <input id="send" type="button" value="send" />
+  
+        <textarea id="chat" rows="20" cols="40" readOnly></textarea>
+  
+        <div className="anim"></div>
       </div>
     );
   }
