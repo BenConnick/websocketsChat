@@ -5,11 +5,12 @@
   "dependencies": {
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
-    "react-scripts": "1.0.10"
+    "react-scripts": "1.0.10",
+    "socket.io": "^1.7.2"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && mv build ../../src",
+    "build": "react-scripts build && rm -rf ../../src/build && mv build ../../src",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
