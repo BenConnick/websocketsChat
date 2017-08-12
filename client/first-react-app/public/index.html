@@ -66,7 +66,7 @@
 
         socket.on('msg', (data) => {
           console.log(data);
-          chat.value = '' + chat.value + '\n' + data.name + ': ' + data.msg;
+          chat.innerHTML = '' + chat.innerHTML + '\n' + data.name + ': ' + data.msg;
         });
 
         // send message from the input element called message

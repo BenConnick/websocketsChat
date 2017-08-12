@@ -17,7 +17,8 @@ class App extends Component {
         <input id="message" name="message" type="text"/>
         <input id="send" type="button" value="send" />
   
-        <textarea id="chat" rows="20" cols="40" readOnly></textarea>
+        <div id="chat"></div>
+        
   
         <div className="anim"></div>
       </div>

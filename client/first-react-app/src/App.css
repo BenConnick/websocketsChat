@@ -24,13 +24,14 @@ textarea {
   background-color: #EEEEEE;
 }
 .anim {
-  width: 1000px;
-  height: 1000px;
+  width: 200px;
+  height: 200px;
   background-image: url("images/cat_idle.png");
   animation: play .8s steps(7) infinite;
+  background-size: 700%;
 }
 
 @keyframes play {
-   from { background-position:    0px; }
-   to { background-position: -7000px; }
+   from { background-position:    0%; }
+   to { background-position: -700%; }
 }

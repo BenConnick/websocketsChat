@@ -1,10 +1,11 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name="theme-color" content="#000000"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/favicon.ico"><title>React App</title><script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script><link href="/static/css/main.590b71ae.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script>// -----------------------------------------
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name="theme-color" content="#000000"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/favicon.ico"><title>React App</title><script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script><link href="/static/css/main.eeed8cff.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script>// -----------------------------------------
       //              WEBSOCKETS
       // -----------------------------------------
       let userName = "unknown";
+      let chat = undefined;
       const connectSocket = (e) => {
         const message = document.querySelector("#message");
-        const chat = document.querySelector("#chat");
+        chat = document.querySelector("#chat");
         const socket = io.connect();
   
         socket.on('connect', () => {
@@ -26,7 +27,14 @@
 
         socket.on('msg', (data) => {
           console.log(data);
-          chat.value = '' + chat.value + '\n' + data.name + ': ' + data.msg;
+          switch(data.msg) {
+            case 'cat':
+            output(data.name, "<div class='anim'></div>");
+            break;
+            default:
+            output(data.name, data.msg);
+            break;
+          }
         });
 
         // send message from the input element called message
@@ -55,10 +63,14 @@
         }
       });
       };
+      
+      const output = (sourceName, msg) => {
+        chat.innerHTML = '' + chat.innerHTML + '<p>' + sourceName + ': ' + msg + '</p>';
+      };
 
       const init = () => {
         const connect = document.querySelector("#connect");
         connect.addEventListener('click',connectSocket);
       };
 
-      window.onload = init;</script><script type="text/javascript" src="/static/js/main.aeab16c7.js"></script></body></html>
+      window.onload = init;</script><script type="text/javascript" src="/static/js/main.eb3ced2c.js"></script></body></html>
