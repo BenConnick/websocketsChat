@@ -44,23 +44,48 @@ textarea {
 }
 
 .sendMessageBar {
-  position: absolute;
+  position: fixed;
   bottom: 0px;
   width: 100vw; 
+  height: 2em;
 }
 
 .sendMessageBar input {
-  margin: 0;
-  height: 2em;
-  width: 30vw;
-  border: none;
-  display: inline-block;
+  width: 68%; 
+  height: 100%;
   font-size: 1em;
-  font-family: 'Caveat Brush', cursive;
+  border: none;
+  padding: 0;
+  display: inline-block;
+  vertical-align: middle;
 }
 
-.sendMessageBar .messageInput {
-  width: 69vw; 
-  height: 2em;
-  font-size: 1em;
+.inputSpacer {
+  vertical-align: middle;
+  width: 2%;
+  height: 100%;
+  background-color: white;
+  display: inline-block;
+}
+
+.inlineBlock {
+  display: inline-block;
+}
+
+#send {
+  vertical-align: middle;
+  text-align: center;
+  background-color: gray;
+  margin: 0;
+  height: 100%;
+  width: 30%;
+  border: none;
+  display: inline-block;
+  font-size: 1.5em;
+  font-family: 'Caveat Brush', cursive;
+  vertical-align: middle;
+}
+
+#send:hover {
+  cursor: pointer;
 }

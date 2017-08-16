@@ -25,7 +25,9 @@ const connectSocket = (e) => {
 
     // remove button
     const connect = document.querySelector("#connect");
+    connect.parentNode.removeChild(document.querySelector("#username"));
     connect.parentNode.removeChild(connect);
+    
   });
 
   socket.on('msg', (data) => {
@@ -117,8 +119,9 @@ class App extends Component {
         <br/>
         <Login/>
         <div className="sendMessageBar">
+          <div className="inputSpacer"></div>
           <input className="messageInput" id="message" name="message" type="text"/>
-          <input id="send" type="button" value="send" />
+          <div id="send"><div className="inlineBlock">send</div></div>
         </div>
   
         <div id="chat"></div>
