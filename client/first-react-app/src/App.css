@@ -1,13 +1,20 @@
+@import url('https://fonts.googleapis.com/css?family=Caveat+Brush');
+
 .App {
-  
+  background-color: #fff1e8;
+  width: 100vw;
+  height: 100vh;
+  font-family: 'Caveat Brush', Arial;
 }
 
 .App-header {
-  background-color: #222;
-  height: 50px;
+  background-color: #f9a978;
   padding: 20px;
+  height: 40px;
   color: white;
   text-align: center;
+  font-size: 2em;
+  
 }
 
 .App-intro {
@@ -21,7 +28,7 @@
 
 textarea {
   display: block;
-  background-color: #EEEEEE;
+  /*background-color: #EEEEEE;*/
 }
 .anim {
   width: 200px;
@@ -34,4 +41,26 @@ textarea {
 @keyframes play {
    from { background-position:    0%; }
    to { background-position: -700%; }
+}
+
+.sendMessageBar {
+  position: absolute;
+  bottom: 0px;
+  width: 100vw; 
+}
+
+.sendMessageBar input {
+  margin: 0;
+  height: 2em;
+  width: 30vw;
+  border: none;
+  display: inline-block;
+  font-size: 1em;
+  font-family: 'Caveat Brush', cursive;
+}
+
+.sendMessageBar .messageInput {
+  width: 69vw; 
+  height: 2em;
+  font-size: 1em;
 }

@@ -78,27 +78,50 @@ const init = () => {
 
 window.onload = init;
 
+class Message extends Component {
+  render() {
+  return (
+    <div className="message">this.props.text</div>
+    )
+  }
+}
+
+class Chat extends Component {
+  render() {
+    return (
+      this.props.messages
+    )
+  }
+}
+
+class Login extends Component {
+  render() {
+    return (
+      <div>
+        <label htmlFor="user">Username:</label>
+        <input id="username" name="user" type="text"/>
+        <input id="connect" type='button' value='connect'/>
+      </div>
+    )
+  }
+}
+
 class App extends Component {
   render() {
     console.log(socket);
     return (
       <div className="App">
         <div className="App-header">
-          <h2>Welcome to Meowssenger</h2>
+          <div>MEOWSSENGER</div>
         </div>
         <br/>
-        <label htmlFor="user">Username:</label>
-        <input id="username" name="user" type="text"/>
-        <input id="connect" type='button' value='connect'/>
-        <br/>
-        <label htmlFor="message">Message:</label>
-        <input id="message" name="message" type="text"/>
-        <input id="send" type="button" value="send" />
+        <Login/>
+        <div className="sendMessageBar">
+          <input className="messageInput" id="message" name="message" type="text"/>
+          <input id="send" type="button" value="send" />
+        </div>
   
         <div id="chat"></div>
-        
-  
-        <div className="anim"></div>
       </div>
     );
   }
