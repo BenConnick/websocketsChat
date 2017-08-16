@@ -25,9 +25,7 @@ const connectSocket = (e) => {
 
     // remove button
     const connect = document.querySelector("#connect");
-    connect.parentNode.removeChild(document.querySelector("#username"));
-    connect.parentNode.removeChild(connect);
-    
+    connect.parentNode.parentNode.removeChild(connect.parentNode);
   });
 
   socket.on('msg', (data) => {
@@ -99,10 +97,10 @@ class Chat extends Component {
 class Login extends Component {
   render() {
     return (
-      <div>
-        <label htmlFor="user">Username:</label>
+      <div className="login">
+        <label htmlFor="user" style={{fontSize: '0.5em'}}>Username:  </label>
         <input id="username" name="user" type="text"/>
-        <input id="connect" type='button' value='connect'/>
+        <div id="connect">join</div>
       </div>
     )
   }
@@ -117,11 +115,11 @@ class App extends Component {
           <div>MEOWSSENGER</div>
         </div>
         <br/>
-        <Login/>
+        <Login />
         <div className="sendMessageBar">
           <div className="inputSpacer"></div>
           <input className="messageInput" id="message" name="message" type="text"/>
-          <div id="send"><div className="inlineBlock">send</div></div>
+          <div id="send">send</div>
         </div>
   
         <div id="chat"></div>
