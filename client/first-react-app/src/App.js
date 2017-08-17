@@ -98,7 +98,7 @@ class Login extends Component {
   render() {
     return (
       <div className="login">
-        <label htmlFor="user" style={{fontSize: '0.5em'}}>Username:  </label>
+        <label htmlFor="user">Name:</label>
         <input id="username" name="user" type="text"/>
         <div id="connect">join</div>
       </div>
