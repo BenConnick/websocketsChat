@@ -43,6 +43,13 @@ textarea {
   background-size: 700%;
 }
 
+.cat {
+  width: 200px;
+  height: 200px;
+  background-image: url("images/cat_idle.png");
+  background-size: 700%;
+}
+
 @keyframes play {
    from { background-position:    0%; }
    to { background-position: -700%; }
@@ -144,4 +151,26 @@ textarea {
 #connect:hover {
   background-color: gray;
   cursor: pointer;
+}
+
+.cats {
+  position: fixed;
+  bottom: 1.5em;
+  width: 100vw; 
+  height: 1.5em;
+}
+
+.cat {
+  position: absolute;
+}
+
+canvas {
+  position: fixed;
+  bottom: 1.5em;
+  width: 100vw; 
+  height 33.3vw:
+}
+
+.imageResource {
+  display: none;
 }
