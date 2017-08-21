@@ -55,6 +55,14 @@ textarea {
    to { background-position: -700%; }
 }
 
+.message {
+
+}
+
+.own {
+  text-align: right;
+}
+
 .sendMessageBar {
   position: fixed;
   bottom: 0px;
@@ -102,7 +110,8 @@ textarea {
 }
 
 #chat {
-  margin-left: 1vw;
+  margin-left: 0vw 4vw;
+  font-size: 0.75em;
 }
 
 .login {

@@ -12,11 +12,46 @@ const socket = io();
 // sockets
 let userName = "unknown";
 let chat = undefined;
+let offline = false;
+
+const loginUIChange = () => {
+  // remove login menu
+  const connect = document.querySelector("#connect");
+  connect.parentNode.parentNode.removeChild(connect.parentNode);
+  // show chat
+  setChatVisibility(true);
+}
+
+const setChatVisibility = (vis) => {
+  if (vis) {
+    canvas.style.display = "block";
+    document.querySelector(".sendMessageBar").style.display="block";
+  } else {
+    canvas.style.display = "none";
+    document.querySelector(".sendMessageBar").style.display="none";
+  }
+}
+
+const checkForAnim = (str,own) => {
+  const cat = own ? cat1 : cat2;
+  switch(str) {
+    case '*blink*':
+    cat.anim = Object.assign(new Anim(), idle);
+    return true;
+    break;
+    default:
+    return false;
+    break;
+  }
+}
 
 const connectSocket = (e) => {
-  const message = document.querySelector("#message");
-  chat = document.querySelector("#chat");
+  const messageInput = document.querySelector("#message");
+  //chat = document.querySelector("#chat");
+  
   const socket = io.connect();
+  
+  if (!socket) alert("io not found");
 
   socket.on('connect', () => {
     console.log('connecting');
@@ -29,55 +64,69 @@ const connectSocket = (e) => {
 
     socket.emit('join', { name: user });
     userName = user;
-
-    // remove button
-    const connect = document.querySelector("#connect");
-    connect.parentNode.parentNode.removeChild(connect.parentNode);
+    
+    // change from login to chat
+    loginUIChange();
+  });
+  
+  socket.on('connect_error', () => {
+    // enter offline mode (debugging only)
+    console.log("offline");
+    socket.disconnect();
+    offline = true;
+    // set user name
+    let user = document.querySelector("#username").value;
+    // change from login to chat
+    loginUIChange();
+    // display message
+    output('Error', 'connection failed. You are offline. ');
   });
 
   socket.on('msg', (data) => {
-    console.log(data);
-    switch(data.msg) {
-      case 'cat':
-      output(data.name, "<div class='anim'></div>");
-      break;
-      default:
-      output(data.name, data.msg);
-      break;
-    }
+    output(data.name, data.msg);
   });
 
   // send message from the input element called message
   const sendMsgFromInput = () => {
+    if (offline) {
+      output(userName,messageInput.value);
+      messageInput.value = "";
+      return;
+    }
+
     // don't send emtpy message
-    if (message.value === "") return;
+    if (messageInput.value === "") return;
     // send message with user name
     const response = {
-    name: userName,
-    msg: message.value,
-  };
-  socket.emit('msgToServer', response);
-  message.value = "";
-}
+      name: userName,
+      msg: messageInput.value,
+    };
+    socket.emit('msgToServer', response);
+    messageInput.value = "";
+  }
 
   // hook up send button
   const send = document.querySelector("#send");
   send.addEventListener('click',sendMsgFromInput);
 
-// send with enter key
-window.addEventListener("keydown", (e) => {
-  switch(e.keyCode) {
-    case 13:
-      sendMsgFromInput();
-      break;
-    default:
-      break;
-  }
-});
+  // send with enter key
+  window.addEventListener("keydown", (e) => {
+    switch(e.keyCode) {
+      case 13:
+        sendMsgFromInput();
+        break;
+      default:
+        break;
+    }
+  });
 };
 
 const output = (sourceName, msg) => {
-  chat.innerHTML = '' + chat.innerHTML + '<p>' + sourceName + ': ' + msg + '</p>';
+  checkForAnim(msg,(sourceName === userName));
+  const m = { own: (sourceName === userName), text: msg };
+  chat.setState({messages: chat.state.messages.concat([m])});
+  
+  /*chat.innerHTML = '' + chat.innerHTML + '<p>' + sourceName + ': ' + msg + '</p>';*/
 };
 
 
@@ -90,6 +139,8 @@ const init = () => {
   canvas = document.querySelector("canvas");
   ctx = canvas.getContext("2d");
   window.requestAnimationFrame(draw);
+  setChatVisibility(false);
+  console.log(chat);
 };
 
 window.onload = init;
@@ -107,44 +158,67 @@ let prevTime = Date.now();
 class Anim {
   constructor() {
     this.startFrame = 0;
-    this.frames = [0,1,2,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-    this.animFPS = 12;
+    this.frames = [0];
+    this.animFPS = 24;
     this.frameNum = 0;
     this.progress = 0;
+    this.loop = false;
   }
 }
 
-const idleRight = new Anim();
+// Animations
+// do not reference directly, use Object.assign to create a copy (new Anim(), animToCopy);
+const noAnim = new Anim();
+const idle = new Anim();
+idle.frames = [0,1,2,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+idle.loop = true;
 
 class Cat {
   constructor() {
-    this.anim = idleRight;
+    this.anim = Object.assign(new Anim,idle);
     this.frameWidth = 1000;
     this.width = 500;
-    this.x = 400;
+    this.x = 500;
     this.y = 160;
+    this.flipped = false;
+  }
+  
+  update(dt) {
+    // update animation
+    this.anim.progress += dt;
+    if (this.anim.loop || this.anim.frameNum < this.anim.frames.length-1) {
+      if (this.anim.progress > 1000/this.anim.animFPS) {
+        const reduction = (1000/this.anim.animFPS) * Math.floor(this.anim.progress / (1000/this.anim.animFPS))
+        this.anim.progress -= reduction;
+        this.anim.frameNum = (this.anim.frameNum + 1) % this.anim.frames.length;  
+      }
+    }
+  }
+  
+  draw() {
+    const w = this.frameWidth;
+    const sx = w * (this.anim.frames[this.anim.frameNum] + this.anim.startFrame);
+    const sy = 0;
+    const dWidth = this.width;
+    const dHeight = dWidth;
+    const dx = - this.width/2;
+    const dy = - this.width/2;
+    ctx.save();
+    ctx.translate(this.x,this.y);
+    if (this.flipped) {
+      ctx.scale(-1,1);  
+    }
+    ctx.drawImage(catImage, sx, sy, w, w, dx, dy, dWidth, dHeight);
+    ctx.restore();
   }
 }
 
 const cat1 = new Cat();
-
-const drawCat = (cat,dt) => {
-  cat.anim.progress += dt;
-  if (cat.anim.progress > 1000/cat.anim.animFPS) {
-    cat.anim.progress -= 1000/cat.anim.animFPS;
-    cat.anim.frameNum = (cat.anim.frameNum + 1) % cat.anim.frames.length;  
-  }
-  const w = cat.frameWidth;
-  const sx = w * (cat.anim.frames[cat.anim.frameNum] + cat.anim.startFrame);
-  const sy = 0;
-  const dWidth = cat.width;
-  const dHeight = dWidth;
-  const dx = cat.x - cat.width/2;
-  const dy = cat.y - cat.width/2;
-  ctx.drawImage(catImage, sx, sy, w, w, dx, dy, cat.width,cat.width);
-
-  //ctx.drawImage(catImage,0,0,1000,1000,0,0,100,100);
-}
+const cat2 = new Cat();
+cat2.x = 100;
+cat2.flipped = true;
+cat2.anim.frameNum = Math.floor(Math.random() * 17);
 
 const draw = () => {
   const dt = Date.now() - prevTime;
@@ -152,7 +226,11 @@ const draw = () => {
   // clear
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   // draw cat 1
-  drawCat(cat1,dt);
+  cat1.update(dt);
+  cat1.draw();
+  
+  cat2.update(dt);
+  cat2.draw();
   window.requestAnimationFrame(draw);
 }
 
@@ -161,18 +239,39 @@ const draw = () => {
 // React
 // ----------------------------------------------
 
-class Message extends Component {
-  render() {
-  return (
-    <div className="message">this.props.text</div>
+function Message(props) {
+  if (props.own) {
+    return (
+      <div className="message own">{props.text}</div>
+    )
+  }
+  else {
+    return (
+      <div className="message">{props.text}</div>
     )
   }
 }
 
 class Chat extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { messages: [{own: true, text: "example"}] }
+  }
   render() {
-    return (
-      this.props.messages
+    const messages = [];
+    this.state.messages.map((msg) => {
+      if (msg.own) {
+        messages.push(<Message own text={msg.text}/>);
+      } else {
+        messages.push(<Message text={msg.text}/>);
+      }
+    })
+    return (  
+      <div id="chat">
+      {
+        messages
+      }
+      </div>
     )
   }
 }
@@ -199,7 +298,6 @@ class Login extends Component {
 
 class App extends Component {
   render() {
-    console.log(socket);
     return (
       <div className="App">
         <div className="App-header">
@@ -213,8 +311,10 @@ class App extends Component {
           <input className="messageInput" id="message" name="message" type="text"/>
           <div id="send">send</div>
         </div>
-  
-        <div id="chat"></div>
+        <Chat 
+          // assign the chat variable
+          ref={(c) => { chat = c; }}
+        />
       </div>
     );
   }
