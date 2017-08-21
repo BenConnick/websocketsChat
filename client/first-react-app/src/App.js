@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
-import catImgUrl from './images/cat_idle.png';
+import idle_url from './images/cat_idle.png';
+import cry_url from './images/cat_cry.png';
 
 // ----------------------------------------------
 // Websockets
@@ -34,15 +35,19 @@ const setChatVisibility = (vis) => {
 
 const checkForAnim = (str,own) => {
   const cat = own ? cat1 : cat2;
+  let keywordFound = true;
   switch(str) {
     case '*blink*':
-    cat.anim = Object.assign(new Anim(), idle);
-    return true;
-    break;
+      cat.anim = Object.assign(new Anim(), idle);
+      break;
+    case '*cry*':
+      cat.anim = Object.assign(new Anim(), cry);
+      break;
     default:
-    return false;
-    break;
+      keywordFound = false;
+      break;
   }
+  return keywordFound;
 }
 
 const connectSocket = (e) => {
@@ -122,11 +127,12 @@ const connectSocket = (e) => {
 };
 
 const output = (sourceName, msg) => {
-  checkForAnim(msg,(sourceName === userName));
-  const m = { own: (sourceName === userName), text: msg };
-  chat.setState({messages: chat.state.messages.concat([m])});
-  
-  /*chat.innerHTML = '' + chat.innerHTML + '<p>' + sourceName + ': ' + msg + '</p>';*/
+  if (checkForAnim(msg,(sourceName === userName))) {
+    // checkForAnim handles animation
+  } else {
+    const m = { own: (sourceName === userName), text: msg };
+    chat.setState({messages: chat.state.messages.concat([m])});
+  }
 };
 
 
@@ -152,17 +158,21 @@ window.onload = init;
 let canvas = undefined;
 let ctx = undefined;
 const catImage = new Image();
-catImage.src = catImgUrl;
+catImage.src = idle_url;
+const cryImage = new Image();
+cryImage.src = cry_url;
 let prevTime = Date.now();
 
 class Anim {
   constructor() {
     this.startFrame = 0;
     this.frames = [0];
-    this.animFPS = 24;
+    this.animFPS = 30;
     this.frameNum = 0;
     this.progress = 0;
-    this.loop = false;
+    this.loopToFrameNum = -1;
+    this.srcImg = catImage;
+    this.spriteSheetWidth = 2;
   }
 }
 
@@ -170,36 +180,46 @@ class Anim {
 // do not reference directly, use Object.assign to create a copy (new Anim(), animToCopy);
 const noAnim = new Anim();
 const idle = new Anim();
-idle.frames = [0,1,2,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-idle.loop = true;
+idle.frames = [0,1,2,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+idle.loopToFrameNum = 0;
+const cry = new Anim();
+cry.srcImg = cryImage;
+cry.spriteSheetWidth = 3;
+cry.frames = [0,1,2,3,4];
+cry.loopToFrameNum = 3;
 
 class Cat {
   constructor() {
     this.anim = Object.assign(new Anim,idle);
-    this.frameWidth = 1000;
-    this.width = 500;
+    this.frameWidth = 600;
+    this.width = 300;
     this.x = 500;
-    this.y = 160;
+    this.y = 120;
     this.flipped = false;
   }
   
   update(dt) {
     // update animation
     this.anim.progress += dt;
-    if (this.anim.loop || this.anim.frameNum < this.anim.frames.length-1) {
-      if (this.anim.progress > 1000/this.anim.animFPS) {
-        const reduction = (1000/this.anim.animFPS) * Math.floor(this.anim.progress / (1000/this.anim.animFPS))
+    if (this.anim.loopToFrameNum >= 0 || this.anim.frameNum < this.anim.frames.length-1) {
+      const frameTime = 1000/this.anim.animFPS;
+      if (this.anim.progress > frameTime) {
+        const reduction = (frameTime * Math.floor(this.anim.progress / frameTime));
         this.anim.progress -= reduction;
-        this.anim.frameNum = (this.anim.frameNum + 1) % this.anim.frames.length;  
+        this.anim.frameNum = (this.anim.frameNum + 1);  
+        if (this.anim.frameNum >= this.anim.frames.length) {
+          this.anim.frameNum = this.anim.loopToFrameNum;
+        }
       }
     }
   }
   
   draw() {
     const w = this.frameWidth;
-    const sx = w * (this.anim.frames[this.anim.frameNum] + this.anim.startFrame);
-    const sy = 0;
+    const frame = (this.anim.frames[this.anim.frameNum] + this.anim.startFrame);
+    const sx = w * (frame % this.anim.spriteSheetWidth);
+    const sy = w * Math.floor(frame / this.anim.spriteSheetWidth);
     const dWidth = this.width;
     const dHeight = dWidth;
     const dx = - this.width/2;
@@ -209,7 +229,7 @@ class Cat {
     if (this.flipped) {
       ctx.scale(-1,1);  
     }
-    ctx.drawImage(catImage, sx, sy, w, w, dx, dy, dWidth, dHeight);
+    ctx.drawImage(this.anim.srcImg, sx, sy, w, w, dx, dy, dWidth, dHeight);
     ctx.restore();
   }
 }
@@ -255,7 +275,7 @@ function Message(props) {
 class Chat extends Component {
   constructor(props) {
     super(props);
-    this.state = { messages: [{own: true, text: "example"}] }
+    this.state = { messages: [] }
   }
   render() {
     const messages = [];

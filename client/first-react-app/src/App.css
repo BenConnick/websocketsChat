@@ -1,7 +1,21 @@
 @import url('https://fonts.googleapis.com/css?family=Caveat+Brush');
 
+@keyframes play {
+   from { background-position:    0%; }
+   to { background-position: -700%; }
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 body {
   background-color: #fff1e8;
+}
+
+textarea {
+  display: block;
 }
 
 .App {
@@ -26,21 +40,19 @@ body {
   font-size: large;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-textarea {
-  display: block;
-  /*background-color: #EEEEEE;*/
-}
 .anim {
   width: 200px;
   height: 200px;
   background-image: url("images/cat_idle.png");
   animation: play .8s steps(7) infinite;
   background-size: 700%;
+}
+
+canvas {
+  position: fixed;
+  bottom: 1.5em;
+  width: 100vw; 
+  height 33.3vw:
 }
 
 .cat {
@@ -50,17 +62,79 @@ textarea {
   background-size: 700%;
 }
 
-@keyframes play {
-   from { background-position:    0%; }
-   to { background-position: -700%; }
+.cats {
+  position: fixed;
+  bottom: 1.5em;
+  width: 100vw; 
+  height: 1.5em;
+  pointer-events: none;
+}
+
+.cat {
+  position: absolute;
+}
+
+.imageResource {
+  display: none;
+}
+
+.inputSpacer {
+  vertical-align: middle;
+  width: 2%;
+  height: 100%;
+  background-color: white;
+  display: inline-block;
+}
+
+.inlineBlock {
+  display: inline-block;
+}
+
+.login {
+  position: absolute;
+  left: 15vw;
+  top: 25vh;
+  padding: 5vw;
+  width: 60vw;
+  height: 55vw;
+  background-color: #59595b;
+  text-align: center;
+  border-radius: 0.5em;
+  color: white;
+}
+
+.login input {
+  width: 60%;
+  position: relative;
+  left: 20%;
+  height: 1em;
+  margin: 0;
+  margin-bottom: 1em;
+  padding: 0;
+  border: none;
+  display: block;
+  font-size: 1em;
+}
+
+.login label {
+  margin: 1em 0em;
+  padding: 0;
+  width: 100%;
+  height: 1em;
+  display: block;
 }
 
 .message {
-
+  padding: 4vw;
+  padding-top: 1vw;
+  background-position: right;
+  background-size: 400px 100%;
+  background-repeat: no-repeat;
 }
 
 .own {
   text-align: right;
+  background-image: url("images/bubble.png");
 }
 
 .sendMessageBar {
@@ -80,16 +154,27 @@ textarea {
   vertical-align: middle;
 }
 
-.inputSpacer {
-  vertical-align: middle;
-  width: 2%;
-  height: 100%;
-  background-color: white;
+#chat {
+  display: block;
+  margin: 0vw 4vw;
+  font-size: 0.75em;
+  height: 50%;
+  width: 94vw;
+  overflow-y: scroll;
+}
+
+#connect {
+  width: 50%;
+  height: 1.25em;
+  border-radius: 0.5em;
+  background-color: #353537;
+  display: inline-block;
   display: inline-block;
 }
 
-.inlineBlock {
-  display: inline-block;
+#connect:hover {
+  background-color: gray;
+  cursor: pointer;
 }
 
 #send {
@@ -107,79 +192,4 @@ textarea {
 
 #send:hover {
   cursor: pointer;
-}
-
-#chat {
-  margin-left: 0vw 4vw;
-  font-size: 0.75em;
-}
-
-.login {
-  position: absolute;
-  left: 15vw;
-  top: 25vh;
-  padding: 5vw;
-  width: 60vw;
-  height: 55vw;
-  background-color: #59595b;
-  text-align: center;
-  border-radius: 0.5em;
-  color: white;
-}
-
-.login label {
-  margin: 1em 0em;
-  padding: 0;
-  width: 100%;
-  height: 1em;
-  display: block;
-}
-
-.login input {
-  width: 60%;
-  position: relative;
-  left: 20%;
-  height: 1em;
-  margin: 0;
-  margin-bottom: 1em;
-  padding: 0;
-  border: none;
-  display: block;
-  font-size: 1em;
-}
-
-#connect {
-  width: 50%;
-  height: 1.25em;
-  border-radius: 0.5em;
-  background-color: #353537;
-  display: inline-block;
-  display: inline-block;
-}
-
-#connect:hover {
-  background-color: gray;
-  cursor: pointer;
-}
-
-.cats {
-  position: fixed;
-  bottom: 1.5em;
-  width: 100vw; 
-  height: 1.5em;
-}
-
-.cat {
-  position: absolute;
-}
-
-canvas {
-  position: fixed;
-  bottom: 1.5em;
-  width: 100vw; 
-  height 33.3vw:
-}
-
-.imageResource {
-  display: none;
 }
