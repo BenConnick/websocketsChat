@@ -295,7 +295,7 @@ class Chat extends Component {
 class Cats extends Component {
   render() {
     return (
-      <canvas width='600' height='200'></canvas>
+      <canvas className="cats" width='600' height='200'></canvas>
     )
   }
 }
