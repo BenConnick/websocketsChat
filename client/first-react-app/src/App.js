@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import idle_url from './images/cat_idle.png';
-import cry_url from './images/cat_cry.png';
+import spritesheet_url from './images/cat_idle+cry.png';
 
 // ----------------------------------------------
 // Websockets
@@ -84,7 +83,7 @@ const connectSocket = (e) => {
     // change from login to chat
     loginUIChange();
     // display message
-    output('Error', 'connection failed. You are offline. ');
+    output('Error', 'Connection failed. You are offline. ');
   });
 
   socket.on('msg', (data) => {
@@ -158,21 +157,19 @@ window.onload = init;
 let canvas = undefined;
 let ctx = undefined;
 const catImage = new Image();
-catImage.src = idle_url;
-const cryImage = new Image();
-cryImage.src = cry_url;
+catImage.src = spritesheet_url;
 let prevTime = Date.now();
 
 class Anim {
   constructor() {
     this.startFrame = 0;
     this.frames = [0];
-    this.animFPS = 30;
+    this.animFPS = 12;
     this.frameNum = 0;
     this.progress = 0;
     this.loopToFrameNum = -1;
     this.srcImg = catImage;
-    this.spriteSheetWidth = 2;
+    this.spriteSheetWidth = 3;
   }
 }
 
@@ -180,12 +177,11 @@ class Anim {
 // do not reference directly, use Object.assign to create a copy (new Anim(), animToCopy);
 const noAnim = new Anim();
 const idle = new Anim();
-idle.frames = [0,1,2,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+idle.startFrame = 5;
+idle.frames = [0,1,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 idle.loopToFrameNum = 0;
 const cry = new Anim();
-cry.srcImg = cryImage;
-cry.spriteSheetWidth = 3;
 cry.frames = [0,1,2,3,4];
 cry.loopToFrameNum = 3;
 
