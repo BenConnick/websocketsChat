@@ -1,9 +1,10 @@
 {
-  "main.css": "static/css/main.9d2924e8.css",
-  "main.css.map": "static/css/main.9d2924e8.css.map",
-  "main.js": "static/js/main.edb4bd3c.js",
-  "main.js.map": "static/js/main.edb4bd3c.js.map",
+  "main.css": "static/css/main.64a18e59.css",
+  "main.css.map": "static/css/main.64a18e59.css.map",
+  "main.js": "static/js/main.a2f3ec6f.js",
+  "main.js.map": "static/js/main.a2f3ec6f.js.map",
   "static/media/bubble.png": "static/media/bubble.0214757f.png",
   "static/media/cat_idle+cry.png": "static/media/cat_idle+cry.2fd2f88c.png",
-  "static/media/cat_idle.png": "static/media/cat_idle.3216d6e9.png"
+  "static/media/cat_idle.png": "static/media/cat_idle.3216d6e9.png",
+  "static/media/cat_love.png": "static/media/cat_love.48f33f57.png"
 }

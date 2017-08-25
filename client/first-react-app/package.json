@@ -11,7 +11,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build && rm -rf ../../src/build && mv build ../../src",
-    "publish": "npm run build && git add . && git commit -m 'auto commit' && git push && git push heroku",
+    "publish": "npm run build && git add -A && git commit -m 'auto commit' && git push && git push heroku",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
