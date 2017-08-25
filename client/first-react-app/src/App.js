@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import spritesheet_url from './images/cat_idle+cry.png';
+import love_url from './images/cat_love.png';
 
 // ----------------------------------------------
 // Websockets
@@ -41,6 +42,9 @@ const checkForAnim = (str,own) => {
       break;
     case '*cry*':
       cat.anim = Object.assign(new Anim(), cry);
+      break;
+    case '*love*':
+      cat.anim = Object.assign(new Anim(), love);
       break;
     default:
       keywordFound = false;
@@ -158,6 +162,8 @@ let canvas = undefined;
 let ctx = undefined;
 const catImage = new Image();
 catImage.src = spritesheet_url;
+const loveImage = new Image();
+loveImage.src = love_url;
 let prevTime = Date.now();
 
 class Anim {
@@ -182,8 +188,13 @@ idle.frames = [0,1,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 idle.loopToFrameNum = 0;
 const cry = new Anim();
-cry.frames = [0,1,2,3,4];
+cry.frames = [0,1,2,3,3,4,4];
 cry.loopToFrameNum = 3;
+const love = new Anim();
+love.srcImg = loveImage;
+love.frames = [0,1,2,2,3,3];
+love.loopToFrameNum = 2;
+love.spriteSheetWidth = 2;
 
 class Cat {
   constructor() {
@@ -234,7 +245,7 @@ const cat1 = new Cat();
 const cat2 = new Cat();
 cat2.x = 100;
 cat2.flipped = true;
-cat2.anim.frameNum = Math.floor(Math.random() * 17);
+cat2.anim.frameNum = Math.floor(Math.random() * 15) + 10;
 
 const draw = () => {
   const dt = Date.now() - prevTime;
