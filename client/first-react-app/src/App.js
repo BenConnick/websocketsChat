@@ -83,7 +83,7 @@ const connectSocket = (e) => {
     socket.disconnect();
     offline = true;
     // set user name
-    let user = document.querySelector("#username").value;
+    userName = document.querySelector("#username").value;
     // change from login to chat
     loginUIChange();
     // display message
@@ -167,9 +167,9 @@ loveImage.src = love_url;
 let prevTime = Date.now();
 
 class Anim {
-  constructor() {
+  constructor(frames) {
     this.startFrame = 0;
-    this.frames = [0];
+    this.frames = frames;
     this.animFPS = 12;
     this.frameNum = 0;
     this.progress = 0;
@@ -181,24 +181,20 @@ class Anim {
 
 // Animations
 // do not reference directly, use Object.assign to create a copy (new Anim(), animToCopy);
-const noAnim = new Anim();
-const idle = new Anim();
+const idle = new Anim([0,1,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
 idle.startFrame = 5;
-idle.frames = [0,1,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 idle.loopToFrameNum = 0;
-const cry = new Anim();
-cry.frames = [0,1,2,3,3,4,4];
+const cry = new Anim([0,1,2,3,3,4,4]);
 cry.loopToFrameNum = 3;
-const love = new Anim();
+const love = new Anim([0,1,2,2,3,3]);
 love.srcImg = loveImage;
-love.frames = [0,1,2,2,3,3];
 love.loopToFrameNum = 2;
 love.spriteSheetWidth = 2;
 
 class Cat {
   constructor() {
-    this.anim = Object.assign(new Anim,idle);
+    this.anim = Object.assign(new Anim(),idle);
     this.frameWidth = 600;
     this.width = 300;
     this.x = 500;
@@ -303,6 +299,18 @@ class Chat extends Component {
   }
 }
 
+class SpeechBubble extends Component {
+  render() {
+    let className = "speechBubble";
+    if (this.props.own) {
+      className += " own"
+    }
+    return (
+      <div className={className}><span>{this.props.text}</span></div>
+    )
+  }
+}
+
 class Cats extends Component {
   render() {
     return (
@@ -342,6 +350,8 @@ class App extends Component {
           // assign the chat variable
           ref={(c) => { chat = c; }}
         />
+        <SpeechBubble text="test"/>
+        <SpeechBubble own text="test"/>
       </div>
     );
   }

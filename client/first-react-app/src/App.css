@@ -29,12 +29,12 @@ textarea {
 
 .App-header {
   background-color: #f9a978;
-  padding-top: 20px;
-  padding-bottom: 40px;
+  padding-top: 10px;
+  padding-bottom: 15px;
   height: 40px;
   color: white;
   text-align: center;
-  font-size: 1.5em;
+  font-size: 1em;
   
 }
 
@@ -131,9 +131,8 @@ canvas {
   background-repeat: no-repeat;
 }
 
-.own {
+.message .own {
   text-align: right;
-  background-image: url("images/bubble.png");
 }
 
 .sendMessageBar {
@@ -153,11 +152,33 @@ canvas {
   vertical-align: middle;
 }
 
+
+.speechBubble {
+  border: solid 10px;
+  border-image: url("images/ChatBubble.png") 30 repeat;
+  display: inline;
+  margin: 0px 30px;
+  position: absolute;
+  right: initial;
+  left: 0px;
+  font-size: 0.75em;
+}
+
+.speechBubble.own {
+  right: 0px;
+  left: initial;
+}
+
+.speechBubble span {
+  background-color: #a1a38e;
+  display: inline-block;
+}
+
 #chat {
   display: block;
   margin: 0% 4%;
   font-size: 0.75em;
-  height: 50%;
+  height: 40%;
   width: 94%;
   overflow-y: scroll;
 }
