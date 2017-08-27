@@ -124,14 +124,17 @@ canvas {
 }
 
 .message {
-  padding: 4%;
-  padding-top: 1%;
-  background-position: right;
-  background-size: 400px 100%;
-  background-repeat: no-repeat;
+  border: solid 10px;
+  border-image: url("images/ChatBubble.png") 30 repeat;
+  font-size: 0.75em;
+  display: inline-block;
 }
 
-.message .own {
+.message.own {
+  filter: hue-rotate(180deg);
+}
+
+.messageContainer.own {
   text-align: right;
 }
 
@@ -152,24 +155,7 @@ canvas {
   vertical-align: middle;
 }
 
-
-.speechBubble {
-  border: solid 10px;
-  border-image: url("images/ChatBubble.png") 30 repeat;
-  display: inline;
-  margin: 0px 30px;
-  position: absolute;
-  right: initial;
-  left: 0px;
-  font-size: 0.75em;
-}
-
-.speechBubble.own {
-  right: 0px;
-  left: initial;
-}
-
-.speechBubble span {
+.message span {
   background-color: #a1a38e;
   display: inline-block;
 }
@@ -178,7 +164,7 @@ canvas {
   display: block;
   margin: 0% 4%;
   font-size: 0.75em;
-  height: 40%;
+  height: 60%;
   width: 94%;
   overflow-y: scroll;
 }

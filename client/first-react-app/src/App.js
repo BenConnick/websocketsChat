@@ -263,22 +263,22 @@ const draw = () => {
 // ----------------------------------------------
 
 function Message(props) {
-  if (props.own) {
-    return (
-      <div className="message own">{props.text}</div>
-    )
-  }
-  else {
-    return (
-      <div className="message">{props.text}</div>
-    )
-  }
+  let className = props.own ? "message own" : "message";
+  let parentClassName = props.own ? "messageContainer own" : "messageContainer";
+
+  return (
+    <div className={parentClassName}><div className={className}><span>{props.text}</span></div></div>
+  );
 }
 
 class Chat extends Component {
   constructor(props) {
     super(props);
     this.state = { messages: [] }
+  }
+  componentDidUpdate (prevProps, prevState) {
+    // innefficient, need to find better way
+    document.querySelector("#chat").scrollTop = 100000000;
   }
   render() {
     const messages = [];
@@ -295,18 +295,6 @@ class Chat extends Component {
         messages
       }
       </div>
-    )
-  }
-}
-
-class SpeechBubble extends Component {
-  render() {
-    let className = "speechBubble";
-    if (this.props.own) {
-      className += " own"
-    }
-    return (
-      <div className={className}><span>{this.props.text}</span></div>
     )
   }
 }
@@ -350,8 +338,6 @@ class App extends Component {
           // assign the chat variable
           ref={(c) => { chat = c; }}
         />
-        <SpeechBubble text="test"/>
-        <SpeechBubble own text="test"/>
       </div>
     );
   }
