@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import './App.css';
 import spritesheet_url from './images/cat_idle+cry.png';
 import love_url from './images/cat_love.png';
+import sleep_url from './images/cat_sleep.png';
+import love_t from './images/thumbnails/love.png';
+import blink_t from './images/thumbnails/blink.png';
+import cry_t from './images/thumbnails/cry.png';
+import sleep_t from './images/thumbnails/sleep.png';
 
 // ----------------------------------------------
 // Websockets
@@ -14,6 +19,9 @@ const socket = io();
 let userName = "unknown";
 let chat = undefined;
 let offline = false;
+
+// send message function
+let sendMessage;
 
 const loginUIChange = () => {
   // remove login menu
@@ -38,13 +46,16 @@ const checkForAnim = (str,own) => {
   let keywordFound = true;
   switch(str) {
     case '*blink*':
-      cat.anim = Object.assign(new Anim(), idle);
+      cat.anim = Object.assign(new Anim(), anims.blink);
       break;
     case '*cry*':
-      cat.anim = Object.assign(new Anim(), cry);
+      cat.anim = Object.assign(new Anim(), anims.cry);
       break;
     case '*love*':
-      cat.anim = Object.assign(new Anim(), love);
+      cat.anim = Object.assign(new Anim(), anims.love);
+      break;
+    case '*sleep*':
+      cat.anim = Object.assign(new Anim(), anims.sleep);
       break;
     default:
       keywordFound = false;
@@ -112,6 +123,11 @@ const connectSocket = (e) => {
     socket.emit('msgToServer', response);
     messageInput.value = "";
   }
+  
+  sendMessage = (msg) => {
+    messageInput.value = msg;
+    sendMsgFromInput();
+  }
 
   // hook up send button
   const send = document.querySelector("#send");
@@ -130,12 +146,10 @@ const connectSocket = (e) => {
 };
 
 const output = (sourceName, msg) => {
-  if (checkForAnim(msg,(sourceName === userName))) {
-    // checkForAnim handles animation
-  } else {
-    const m = { own: (sourceName === userName), text: msg };
-    chat.setState({messages: chat.state.messages.concat([m])});
-  }
+  // handle animaiton
+  checkForAnim(msg,(sourceName === userName)); 
+  const m = { own: (sourceName === userName), text: msg };
+  chat.setState({messages: chat.state.messages.concat([m])});
 };
 
 
@@ -158,12 +172,24 @@ window.onload = init;
 // ----------------------------------------------
 // Cavas
 // ----------------------------------------------
+
+const animationNames = ["blink","cry","love","sleep"];
+const anims = {
+  blink: null,
+  cry: null,
+  love: null,
+  sleep: null,
+}
+// thumbnail image links
+const thumbnails = [blink_t, cry_t, love_t, sleep_t];
 let canvas = undefined;
 let ctx = undefined;
 const catImage = new Image();
 catImage.src = spritesheet_url;
 const loveImage = new Image();
 loveImage.src = love_url;
+const sleepImage = new Image();
+sleepImage.src = sleep_url;
 let prevTime = Date.now();
 
 class Anim {
@@ -181,20 +207,24 @@ class Anim {
 
 // Animations
 // do not reference directly, use Object.assign to create a copy (new Anim(), animToCopy);
-const idle = new Anim([0,1,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+anims.blink = new Anim([0,1,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-idle.startFrame = 5;
-idle.loopToFrameNum = 0;
-const cry = new Anim([0,1,2,3,3,4,4]);
-cry.loopToFrameNum = 3;
-const love = new Anim([0,1,2,2,3,3]);
-love.srcImg = loveImage;
-love.loopToFrameNum = 2;
-love.spriteSheetWidth = 2;
+anims.blink.startFrame = 5;
+anims.blink.loopToFrameNum = 0;
+anims.cry = new Anim([0,1,2,3,3,4,4]);
+anims.cry.loopToFrameNum = 3;
+anims.love = new Anim([0,1,2,2,3,3]);
+anims.love.srcImg = loveImage;
+anims.love.loopToFrameNum = 2;
+anims.love.spriteSheetWidth = 2;
+anims.sleep = new Anim([0,0,1,1,2,2,2,2,3,3,3,3]);
+anims.sleep.loopToFrameNum = 4;
+anims.sleep.spriteSheetWidth = 2;
+anims.sleep.srcImg = sleepImage;
 
 class Cat {
   constructor() {
-    this.anim = Object.assign(new Anim(),idle);
+    this.anim = Object.assign(new Anim(),anims.blink);
     this.frameWidth = 600;
     this.width = 300;
     this.x = 500;
@@ -271,6 +301,14 @@ function Message(props) {
   );
 }
 
+class StickerModeButton extends Component{
+  render() {
+    return(
+      <div className="stickerModeBtn" onClick={this.props.onClick}>😀</div>
+    );
+  }
+}
+
 class Chat extends Component {
   constructor(props) {
     super(props);
@@ -282,12 +320,14 @@ class Chat extends Component {
   }
   render() {
     const messages = [];
+    let count = 0;
     this.state.messages.map((msg) => {
       if (msg.own) {
-        messages.push(<Message own text={msg.text}/>);
+        messages.push(<Message key={count} own text={msg.text}/>);
       } else {
-        messages.push(<Message text={msg.text}/>);
+        messages.push(<Message key={count} text={msg.text}/>);
       }
+      count++;
     })
     return (  
       <div id="chat">
@@ -302,7 +342,32 @@ class Chat extends Component {
 class Cats extends Component {
   render() {
     return (
-      <canvas className="cats" width='600' height='200'></canvas>
+      <canvas className={this.props.className} width='600' height='200'></canvas>
+    )
+  }
+}
+
+class StickerButton extends Component {
+  render() {
+    return (
+      <div className="stickerBtn" 
+        style={{
+          backgroundImage: "url("+this.props.url+")"
+        }} 
+        onClick={() => {
+          sendMessage("*"+this.props.anim+"*");
+        }}>
+      </div>
+    )
+  }
+}
+
+class StickerMenu extends Component {
+  render() {
+    return (
+      <div className={this.props.className}>
+        {this.props.stickerButtons}
+      </div>
     )
   }
 }
@@ -320,7 +385,25 @@ class Login extends Component {
 }
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    const numbers = [0,1,2,3];
+    const listItems = numbers.map((number) => {
+      return <StickerButton 
+        key={number} 
+        anim={animationNames[number]} 
+        url={thumbnails[number]}/>
+      }
+    );
+    this.state = {
+      catsClass: "cats",
+      msgBarClass: "sendMessageBar",
+      showStickers: false,
+      stickerButtons: listItems
+    };
+  }
   render() {
+    console.log(this.state);
     return (
       <div className="App">
         <div className="App-header">
@@ -328,10 +411,11 @@ class App extends Component {
         </div>
         <br/>
         <Login />
-        <Cats/>
-        <div className="sendMessageBar">
-          <div className="inputSpacer"></div>
+        <Cats className={this.state.catsClass} />
+        <div className={this.state.msgBarClass}>
+          <StickerMenu className="stickerMenu" stickerButtons={this.state.stickerButtons}/>
           <input className="messageInput" id="message" name="message" type="text"/>
+          <StickerModeButton onClick={() => {this.toggleStickerMenu();}}/>
           <div id="send">send</div>
         </div>
         <Chat 
@@ -340,6 +424,15 @@ class App extends Component {
         />
       </div>
     );
+  }
+  toggleStickerMenu() {
+    this.setState((prevState, props) => {
+      return {
+        showStickers: !prevState.showStickers,
+        msgBarClass: prevState.showStickers ? "sendMessageBar" : "sendMessageBar raised",
+        catsClass: prevState.showStickers ? "cats" : "cats raised",
+      };
+    });
   }
 }
 

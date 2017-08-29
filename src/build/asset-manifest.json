@@ -1,10 +1,15 @@
 {
-  "main.css": "static/css/main.2bae9208.css",
-  "main.css.map": "static/css/main.2bae9208.css.map",
-  "main.js": "static/js/main.f82408eb.js",
-  "main.js.map": "static/js/main.f82408eb.js.map",
+  "main.css": "static/css/main.8729fb30.css",
+  "main.css.map": "static/css/main.8729fb30.css.map",
+  "main.js": "static/js/main.03550508.js",
+  "main.js.map": "static/js/main.03550508.js.map",
   "static/media/ChatBubble.png": "static/media/ChatBubble.e42d3d7e.png",
+  "static/media/blink.png": "static/media/blink.b5a48df6.png",
   "static/media/cat_idle+cry.png": "static/media/cat_idle+cry.2fd2f88c.png",
   "static/media/cat_idle.png": "static/media/cat_idle.3216d6e9.png",
-  "static/media/cat_love.png": "static/media/cat_love.48f33f57.png"
+  "static/media/cat_love.png": "static/media/cat_love.48f33f57.png",
+  "static/media/cat_sleep.png": "static/media/cat_sleep.c813f333.png",
+  "static/media/cry.png": "static/media/cry.3852bd09.png",
+  "static/media/love.png": "static/media/love.c2317256.png",
+  "static/media/sleep.png": "static/media/sleep.1484bc1c.png"
 }
