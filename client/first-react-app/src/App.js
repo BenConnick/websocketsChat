@@ -330,7 +330,7 @@ class Chat extends Component {
       count++;
     })
     return (  
-      <div id="chat">
+      <div id="chat" className={this.props.className}>
       {
         messages
       }
@@ -356,6 +356,7 @@ class StickerButton extends Component {
         }} 
         onClick={() => {
           sendMessage("*"+this.props.anim+"*");
+          this.props.toggleMenu();
         }}>
       </div>
     )
@@ -392,15 +393,19 @@ class App extends Component {
       return <StickerButton 
         key={number} 
         anim={animationNames[number]} 
-        url={thumbnails[number]}/>
+        url={thumbnails[number]}
+        toggleMenu={() => {this.toggleStickerMenu();}}
+        />
       }
     );
     this.state = {
       catsClass: "cats",
       msgBarClass: "sendMessageBar",
+      chatClass: "",
       showStickers: false,
-      stickerButtons: listItems
+      stickerButtons: listItems,
     };
+    
   }
   render() {
     console.log(this.state);
@@ -421,6 +426,7 @@ class App extends Component {
         <Chat 
           // assign the chat variable
           ref={(c) => { chat = c; }}
+          className={this.state.chatClass}
         />
       </div>
     );
@@ -431,6 +437,7 @@ class App extends Component {
         showStickers: !prevState.showStickers,
         msgBarClass: prevState.showStickers ? "sendMessageBar" : "sendMessageBar raised",
         catsClass: prevState.showStickers ? "cats" : "cats raised",
+        chatClass: prevState.showStickers ? "" : "raised",
       };
     });
   }

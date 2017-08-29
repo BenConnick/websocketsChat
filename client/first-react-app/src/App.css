@@ -207,6 +207,10 @@ canvas {
   overflow-y: scroll;
 }
 
+#chat.raised {
+  height: 30%;
+}
+
 #connect {
   width: 50%;
   height: 1.25em;
