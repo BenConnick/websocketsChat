@@ -84,6 +84,8 @@ const connectSocket = (e) => {
     socket.emit('join', { name: user });
     userName = user;
     
+    setCookie('userName',user);
+    
     // change from login to chat
     loginUIChange();
   });
@@ -164,9 +166,39 @@ const init = () => {
   window.requestAnimationFrame(draw);
   setChatVisibility(false);
   console.log(chat);
+  
+  // auto login
+  const name = getCookie('userName');
+  if (name && name != "") {
+    document.querySelector("#username").value = name;
+    connectSocket();
+  }
 };
 
 window.onload = init;
+
+// ----------------------------------------------
+// Utility
+// ----------------------------------------------
+const setCookie = (cname, cvalue) => {
+    const expires = 'expires=Thu, 18 Dec 2022 12:00:00 UTC';
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+const getCookie = (cname) => {
+    const name = cname + "=";
+    const ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
 
 
 // ----------------------------------------------
