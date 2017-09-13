@@ -48,8 +48,7 @@ server.listen(webSocketsServerPort, function() {
 var wsServer = new webSocketServer({
     // WebSocket server is tied to a HTTP server. WebSocket request is just
     // an enhanced HTTP request. For more info http://tools.ietf.org/html/rfc6455#page-6
-    httpServer: server,
-    autoAcceptConnections: true
+    httpServer: server
 });
 
 // This callback function is called every time someone
