@@ -1,6 +1,14 @@
 // http://ejohn.org/blog/ecmascript-5-strict-mode-json-and-more/
 "use strict";
 
+// path reading
+const path = require('path');
+
+// static file serving
+const express = require('express');
+const app = express();
+app.use(express.static(__dirname + '/build'));
+
 // Optional. You will see this name in eg. 'ps' or 'top' command
 process.title = 'node-chat';
 
@@ -27,20 +35,19 @@ function htmlEntities(str) {
                       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-// Array with some colors
-var colors = [ 'red', 'green', 'blue', 'magenta', 'purple', 'plum', 'orange' ];
-// ... in random order
-colors.sort(function(a,b) { return Math.random() > 0.5; } );
-
 /**
  * HTTP server
  */
-var server = http.createServer(function(request, response) {
-    // Not important for us. We're writing WebSocket server, not HTTP server
-});
-server.listen(webSocketsServerPort, function() {
-    console.log((new Date()) + " Server is listening on port " + webSocketsServerPort);
-});
+
+var server = app.listen(webSocketsServerPort);
+/*var server = http.createServer(function(request, response) {
+    // TODO: serve static web page
+    //response.sendFile(path.resolve('src/build/index.html'));
+});*/
+console.log((new Date()) + " Server is listening on port " + webSocketsServerPort);
+/*server.listen(webSocketsServerPort, function() {
+    //console.log((new Date()) + " Server is listening on port " + webSocketsServerPort);
+});*/
 
 /**
  * WebSocket server
@@ -55,24 +62,20 @@ var wsServer = new webSocketServer({
 // tries to connect to the WebSocket server
 wsServer.on('request', function(request) {
     console.log((new Date()) + ' Connection from origin ' + request.origin + '.');
-
-    // accept connection - you should check 'request.origin' to make sure that
-    // client is connecting from your website
-    // (http://en.wikipedia.org/wiki/Same_origin_policy)
+    // accept connection
     var connection = request.accept(null, request.origin); 
-    // we need to know client index to remove them on 'close' event
+    // store client index to remove them on 'close' event
     var index = clients.push(connection) - 1;
-    var userName = false;
-    var userColor = false;
+    var userName = undefined;
 
-    console.log((new Date()) + ' Connection accepted.');
+    console.log((new Date()) + ' Connection accepted from ' + request.origin);
 
     // send back chat history
     if (history.length > 0) {
         connection.sendUTF(JSON.stringify( { type: 'history', data: history} ));
     }
 
-    // user sent some message
+    // user sent message
     connection.on('message', function(message) {
         if (message.type === 'utf8') { // accept only text
             if (userName === false) { // first message sent by user is their name
