@@ -81,11 +81,8 @@ wsServer.on('request', function(request) {
             if (userName === false) { // first message sent by user is their name
                 // remember user name
                 userName = htmlEntities(message.utf8Data);
-                // get random color and send it back to the user
-                userColor = colors.shift();
-                connection.sendUTF(JSON.stringify({ type:'color', data: userColor }));
-                console.log((new Date()) + ' User is known as: ' + userName
-                            + ' with ' + userColor + ' color.');
+                //connection.sendUTF(JSON.stringify({ type:'color', data: userColor }));
+                console.log((new Date()) + ' User is known as: ' + userName);
 
             } else { // log and broadcast the message
                 console.log((new Date()) + ' Received Message from '
@@ -95,8 +92,7 @@ wsServer.on('request', function(request) {
                 var obj = {
                     time: (new Date()).getTime(),
                     text: htmlEntities(message.utf8Data),
-                    author: userName,
-                    color: userColor
+                    author: userName
                 };
                 history.push(obj);
                 history = history.slice(-100);
@@ -112,13 +108,11 @@ wsServer.on('request', function(request) {
 
     // user disconnected
     connection.on('close', function(connection) {
-        if (userName !== false && userColor !== false) {
+        if (userName !== false) {
             console.log((new Date()) + " Peer "
                 + connection.remoteAddress + " disconnected.");
             // remove user from the list of connected clients
             clients.splice(index, 1);
-            // push back user's color to be reused by another user
-            colors.push(userColor);
         }
     });
 

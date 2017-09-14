@@ -6,8 +6,6 @@ $(function () {
     var input = $('#input');
     var status = $('#status');
 
-    // my color assigned by the server
-    var myColor = false;
     // my name sent to the server
     var myName = false;
 
@@ -24,7 +22,7 @@ $(function () {
     }
 
     // open connection
-    var connection = new WebSocket('ws://54.235.183.213:3684');
+    var connection = new WebSocket('ws://localhost:1337');
 
     connection.onopen = function () {
         // first we want users to enter their names
@@ -53,7 +51,7 @@ $(function () {
         // NOTE: if you're not sure about the JSON structure
         // check the server source code above
         if (json.type === 'color') { // first response from the server with user's color
-            myColor = json.data;
+            myColor = 'red';
             status.text(myName + ': ').css('color', myColor);
             input.removeAttr('disabled').focus();
             // from now user can start sending messages
@@ -66,7 +64,7 @@ $(function () {
         } else if (json.type === 'message') { // it's a single message
             input.removeAttr('disabled'); // let the user write another message
             addMessage(json.data.author, json.data.text,
-                       json.data.color, new Date(json.data.time));
+                       'red', new Date(json.data.time));
         } else {
             console.log('Hmm..., I\'ve never seen JSON like this: ', json);
         }
