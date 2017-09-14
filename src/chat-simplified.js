@@ -6,11 +6,6 @@ $(function () {
     var input = $('#input');
     var status = $('#status');
 
-    // my color assigned by the server
-    var myColor = false;
-    // my name sent to the server
-    var myName = false;
-
     // if user is running mozilla then use it's built-in WebSocket
     window.WebSocket = window.WebSocket || window.MozWebSocket;
 
@@ -52,23 +47,13 @@ $(function () {
 
         // NOTE: if you're not sure about the JSON structure
         // check the server source code above
-        if (json.type === 'color') { // first response from the server with user's color
-            myColor = json.data;
-            status.text(myName + ': ').css('color', myColor);
-            input.removeAttr('disabled').focus();
-            // from now user can start sending messages
-        } else if (json.type === 'history') { // entire message history
-            // insert every single message to the chat window
-            for (var i=0; i < json.data.length; i++) {
-                addMessage(json.data[i].author, json.data[i].text,
-                           json.data[i].color, new Date(json.data[i].time));
-            }
-        } else if (json.type === 'message') { // it's a single message
+        if (json.type === 'message') { // it's a single message
             input.removeAttr('disabled'); // let the user write another message
             addMessage(json.data.author, json.data.text,
                        json.data.color, new Date(json.data.time));
         } else {
             console.log('Hmm..., I\'ve never seen JSON like this: ', json);
+            input.removeAttr('disabled'); // let the user write another message
         }
     };
 
@@ -87,11 +72,6 @@ $(function () {
             // disable the input field to make the user wait until server
             // sends back response
             input.attr('disabled', 'disabled');
-
-            // we know that the first message sent from a user their name
-            if (myName === false) {
-                myName = msg;
-            }
         }
     });
 

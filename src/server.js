@@ -16,21 +16,6 @@ http.listen(port, '0.0.0.0', 511, () => {
 });
 
 // FILE SERVING HANDLED BY EXPRESS
-/*
-const port = process.env.PORT || process.env.NODE_PORT || 3000;
-
-const index = fs.readFileSync(`${__dirname}/build/index.html`);
-
-const onRequest = (request, response) => {
-  response.writeHead(200, {'Content-Type': 'text/html'});
-  response.write(index);
-  response.end();
-};
-
-const app = http.createServer(onRequest).listen(port, "0.0.0.0");
-
-console.log(`Listening on 127.0.0.1: ${port}`);
-*/
 
 // returns homepage
 app.get('/', (req, res) => {
@@ -102,62 +87,13 @@ const onMsg = (sock) => {
 	const socket = sock;
 	
 	socket.on('msgToServer', (data) => {
-		// serverside commands
-		if (data.msg.length > 0 && data.msg[0] == "/") {
-			if (data.msg.length > 1) {
-				switch(data.msg[1]) {
-					// roll
-					case "r":
-						if (data.msg.length > 3) {
-							let r = roll(socket.name, data.msg.substring(3));
-							if (r == undefined) {
-								socket.emit('msg', { name: 'server', msg: "Invalid die type. Valid die types are d4, d6, d8, d10, d12, and d20" });
-								return;
-							} else {
-								io.sockets.in('room1').emit('msg', { name: 'server', msg: r});
-								return;
-							}
-						}
-						break;
-					// me
-					case "m":
-						if (data.msg.length > 3) {
-							if (data.msg.substring(2,4) == "e ") {
-								io.sockets.in('room1').emit('msg', { name: "server", msg: `${socket.name} ${data.msg.substring(4)}`});
-								return;
-							}
-						}
-						break;
-					// time
-					case "t":
-						if (data.msg.indexOf("/time") > -1) {
-							const d = new Date();
-							socket.emit('msg', { name: 'server', msg: `Current time is ${d.toTimeString()}`});
-							return;
-						}
-						break;
-					default:
-						break;
-				}
-				
-			}
-			
-			// if we arrived here, no command was valid.
-			socket.emit('msg', { name: socket.name, msg: 'Command '+data.msg.substring(1)+' not understood. Valid commands are "/rd[die number of sides]", "/me [your action]", "/time"' });
-			return;
-		}
-		
 		io.sockets.in('room1').emit('msg', { name: socket.name, msg: data.msg });
 	});
 }
 
 const onDisconnect = (sock) => {
 	const socket = sock;
-	
-	
-	
 	socket.on('disconnect', (data) => {
-		
 		// message for remaining users
 		const leaveMsg = {
 			name: 'server',

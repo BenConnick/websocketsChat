@@ -2,16 +2,15 @@
   "name": "meowssenger",
   "version": "1.0.0",
   "description": "Messenger app using react",
-  "main": "./src/chat-server.js",
+  "main": "./src/server.js",
   "scripts": {
     "nodemon": "nodemon --watch ./src ./src/server.js",
-    "start": "node ./src/chat-server.js",
+    "start": "node ./src/server.js",
     "test": "echo \"No test specified\""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "websocket": "^1.0.24",
     "socket.io": "^1.7.2",
     "express": "^4.15.2"
   },
