@@ -6,7 +6,8 @@
   "scripts": {
     "nodemon": "nodemon --watch ./src ./src/server.js",
     "start": "node ./src/chat-server.js",
-    "test": "echo \"No test specified\""
+    "test": "echo \"No test specified\"",
+    "auto": "git add -A && git commit -m 'auto commit' && git push && git push heroku"
   },
   "author": "",
   "license": "ISC",

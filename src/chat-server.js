@@ -78,7 +78,7 @@ wsServer.on('request', function(request) {
     // user sent message
     connection.on('message', function(message) {
         if (message.type === 'utf8') { // accept only text
-            if (userName === false) { // first message sent by user is their name
+            if (userName === undefined) { // first message sent by user is their name
                 // remember user name
                 userName = htmlEntities(message.utf8Data);
                 //connection.sendUTF(JSON.stringify({ type:'color', data: userColor }));
@@ -92,7 +92,7 @@ wsServer.on('request', function(request) {
                 var obj = {
                     time: (new Date()).getTime(),
                     text: htmlEntities(message.utf8Data),
-                    author: userName
+                    author: userName,
                 };
                 history.push(obj);
                 history = history.slice(-100);

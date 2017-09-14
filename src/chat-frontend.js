@@ -22,7 +22,7 @@ $(function () {
     }
 
     // open connection
-    var connection = new WebSocket('ws://localhost:1337');
+    var connection = new WebSocket('ws://meowssenger.herokuapp.com');
 
     connection.onopen = function () {
         // first we want users to enter their names
