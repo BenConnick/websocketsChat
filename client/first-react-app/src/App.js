@@ -12,10 +12,15 @@ import sleep_t from './images/thumbnails/sleep.png';
 // Websockets
 // ----------------------------------------------
 
-const io = require('socket.io-client');
-const socket = io();
+// if user is running mozilla then use it's built-in WebSocket
+window.WebSocket = window.WebSocket || window.MozWebSocket;
 
+// if browser doesn't support WebSocket, just show some notification and exit
+if (!window.WebSocket) {
+  alert("websockets not supported");
+}
 // sockets
+let connection; // the socket
 let userName = "unknown";
 let chat = undefined;
 let offline = false;
@@ -64,48 +69,60 @@ const checkForAnim = (str,own) => {
   return keywordFound;
 }
 
-const connectSocket = (e) => {
+const connectSocket = () => {
+
+
   const messageInput = document.querySelector("#message");
   //chat = document.querySelector("#chat");
   
-  const socket = io.connect();
+  // open connection
+  connection = new WebSocket('ws://meowssenger.herokuapp.com');
   
-  if (!socket) alert("io not found");
+  if (!connection) alert("uh oh, there's a problem");
 
-  socket.on('connect', () => {
-    console.log('connecting');
+  connection.onopen = function () {
+      console.log('connecting');
 
-    let user = document.querySelector("#username").value;
+      let user = document.querySelector("#username").value;
 
-    if(!user) {
-      user = 'unknown';
-    }
+      if(!user) {
+        user = 'unknown';
+      }
 
-    socket.emit('join', { name: user });
-    userName = user;
-    
-    setCookie('userName',user);
-    
-    // change from login to chat
-    loginUIChange();
-  });
-  
-  socket.on('connect_error', () => {
+      //socket.emit('join', { name: user });
+      connection.send(user);
+      userName = user;
+
+      setCookie('userName',user);
+
+      // change from login to chat
+      loginUIChange();
+  };
+
+  connection.onerror = function (error) {
     // enter offline mode (debugging only)
     console.log("offline");
-    socket.disconnect();
+    //socket.disconnect();
     offline = true;
     // set user name
     userName = document.querySelector("#username").value;
     // change from login to chat
     loginUIChange();
     // display message
-    output('Error', 'Connection failed. You are offline. ');
-  });
-
-  socket.on('msg', (data) => {
-    output(data.name, data.msg);
-  });
+    output('Error', 'Connection failed. You are offline. ' + error);
+  };
+  
+  connection.onmessage = function (message) {
+    let json = "";
+    try {
+        json = JSON.parse(message.data);
+    } catch (e) {
+        console.log('This doesn\'t look like a valid JSON: ', message.data);
+        return;
+    }
+    
+    output(json.data.author, json.data.text);
+  }
 
   // send message from the input element called message
   const sendMsgFromInput = () => {
@@ -118,11 +135,11 @@ const connectSocket = (e) => {
     // don't send emtpy message
     if (messageInput.value === "") return;
     // send message with user name
-    const response = {
+    /*const response = {
       name: userName,
       msg: messageInput.value,
-    };
-    socket.emit('msgToServer', response);
+    };*/
+    connection.send(messageInput.value);
     messageInput.value = "";
   }
   

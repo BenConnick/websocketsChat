@@ -84,7 +84,7 @@ $(function () {
             $(this).val('');
             // disable the input field to make the user wait until server
             // sends back response
-            input.attr('disabled', 'disabled');
+            //input.attr('disabled', 'disabled');
 
             // we know that the first message sent from a user their name
             if (myName === false) {
