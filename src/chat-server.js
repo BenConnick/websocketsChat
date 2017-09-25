@@ -26,6 +26,8 @@ var http = require('http');
 var history = [ ];
 // list of currently connected clients (users)
 var clients = [ ];
+// list of client names
+var userNames = [ ];
 
 /**
  * Helper function for escaping input strings
@@ -83,25 +85,43 @@ wsServer.on('request', function(request) {
                 userName = htmlEntities(message.utf8Data);
                 //connection.sendUTF(JSON.stringify({ type:'color', data: userColor }));
                 console.log((new Date()) + ' User is known as: ' + userName);
-
+                // add to list (maybe problem with ordering...)
+                userNames.push(userName);
             } else { // log and broadcast the message
                 console.log((new Date()) + ' Received Message from '
                             + userName + ': ' + message.utf8Data);
+                            
+                // try to parse json
+                var jsonObj = JSON.parse(message.utf8Data);
+                // if there is no json, then the message is the text
+                var text = jsonObj? jsonObj.text : message.uft8Data;
                 
                 // we want to keep history of all sent messages
                 var obj = {
                     time: (new Date()).getTime(),
-                    text: htmlEntities(message.utf8Data),
+                    text: htmlEntities(text),
                     author: userName,
+                    recipient: htmlEntities(message.utf8Data)
                 };
                 history.push(obj);
                 history = history.slice(-100);
-
+                
+                // broadcast message to sender and recipient
+                var json = JSON.stringify({ type:'message', data: obj });
+                for (var i=0; i < clients.length; i++) {
+                    if (userNames[i] == obj.author || userNames[i] == obj.recipient) {
+                        clients[i].sendUTF(json);
+                    }
+                }
+                
+                /*
                 // broadcast message to all connected clients
                 var json = JSON.stringify({ type:'message', data: obj });
                 for (var i=0; i < clients.length; i++) {
                     clients[i].sendUTF(json);
                 }
+                */
+                
             }
         }
     });
@@ -113,6 +133,7 @@ wsServer.on('request', function(request) {
                 + connection.remoteAddress + " disconnected.");
             // remove user from the list of connected clients
             clients.splice(index, 1);
+            if (userNames[index]) userNames.splice(index, 1);
         }
     });
 

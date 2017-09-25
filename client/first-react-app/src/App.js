@@ -22,6 +22,7 @@ if (!window.WebSocket) {
 // sockets
 let connection; // the socket
 let userName = "unknown";
+let partnerName = "";
 let chat = undefined;
 let offline = false;
 
@@ -84,6 +85,7 @@ const connectSocket = () => {
       console.log('connecting');
 
       let user = document.querySelector("#username").value;
+      let partner = document.querySelector("#partnerName").value;
 
       if(!user) {
         user = 'unknown';
@@ -92,8 +94,10 @@ const connectSocket = () => {
       //socket.emit('join', { name: user });
       connection.send(user);
       userName = user;
+      partnerName = partner;
 
       setCookie('userName',user);
+      setCookie('partnerName',partner);
 
       // change from login to chat
       loginUIChange();
@@ -106,6 +110,8 @@ const connectSocket = () => {
     offline = true;
     // set user name
     userName = document.querySelector("#username").value;
+    // set partner name
+    
     // change from login to chat
     loginUIChange();
     // display message
@@ -120,7 +126,8 @@ const connectSocket = () => {
         console.log('This doesn\'t look like a valid JSON: ', message.data);
         return;
     }
-    
+    if (json.type === "history") return;
+    console.log(json);
     output(json.data.author, json.data.text);
   }
 
@@ -139,7 +146,7 @@ const connectSocket = () => {
       name: userName,
       msg: messageInput.value,
     };*/
-    connection.send(messageInput.value);
+    connection.send("{recipient:'"+partnerName+"',text:'"+messageInput.value+"'}");
     messageInput.value = "";
   }
   
@@ -186,8 +193,10 @@ const init = () => {
   
   // auto login
   const name = getCookie('userName');
-  if (name && name != "") {
+  const partner = getCookie('partnerName');
+  if (name && name !== "" && partner && partner !== "") {
     document.querySelector("#username").value = name;
+    document.querySelector("#partnerName").value = partner;
     connectSocket();
   }
 };
@@ -428,6 +437,8 @@ class Login extends Component {
       <div className="login">
         <label htmlFor="user">Name:</label>
         <input id="username" name="user" type="text"/>
+        <label htmlFor="partner">Partner:</label>
+        <input id="partnerName" name="partner" type="text"/>
         <div id="connect">join</div>
       </div>
     )
