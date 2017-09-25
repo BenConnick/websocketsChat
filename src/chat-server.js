@@ -95,13 +95,14 @@ wsServer.on('request', function(request) {
                 var jsonObj = JSON.parse(message.utf8Data);
                 // if there is no json, then the message is the text
                 var text = jsonObj? jsonObj.text : message.uft8Data;
+                var recipient = jsonObj? jsonObj.recipient : userName;
                 
                 // we want to keep history of all sent messages
                 var obj = {
                     time: (new Date()).getTime(),
                     text: htmlEntities(text),
                     author: userName,
-                    recipient: htmlEntities(message.utf8Data)
+                    recipient: htmlEntities(recipient)
                 };
                 history.push(obj);
                 history = history.slice(-100);
