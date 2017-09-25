@@ -146,7 +146,7 @@ const connectSocket = () => {
       name: userName,
       msg: messageInput.value,
     };*/
-    connection.send("{recipient:'"+partnerName+"',text:'"+messageInput.value+"'}");
+    connection.send("{'recipient':'"+partnerName+"','text':'"+messageInput.value+"'}");
     messageInput.value = "";
   }
   
