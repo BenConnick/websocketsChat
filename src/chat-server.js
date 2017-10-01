@@ -25,8 +25,10 @@ const url2 = "mongodb://BenConnick:$4Mango@grainofsanddb-shard-00-00-hnyhc.mongo
 mongo.connect(url2, function(err, db) {
   if (err != null) throw("error! " + err);
   console.log("Successfully connected to database.");
-  db.collection('history').insert({'user': 'Bon', 'messages': []});
-  db.close();
+  removeAll(db,() => { 
+    db.collection('history').insertOne({'_id': "Bon's history" 'user': 'Bon', 'messages': []});
+    db.close();
+  });
 });
 
 // static file serving
@@ -187,7 +189,7 @@ wsServer.on('request', function(request) {
 
 // delete the entire database!!!
 const removeAll = (db, callback) => {
-   db.collection('saves').deleteMany(
+   db.collection('history').deleteMany(
       {},
       function(err, results) {
          console.log(results);
