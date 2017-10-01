@@ -25,10 +25,17 @@ const url2 = "mongodb://BenConnick:$4Mango@grainofsanddb-shard-00-00-hnyhc.mongo
 mongo.connect(url2, function(err, db) {
   if (err != null) throw("error! " + err);
   console.log("Successfully connected to database.");
-  removeAll(db,() => { 
-    db.collection('history').insertOne({'_id': "Bon's history", 'user': 'Bon', 'messages': []});
+  db.collection('history').update(
+    {'user': 'Bon'},
+    { $set: 
+      {
+        'messages': ['modified']
+      } 
+    }
+  ).then(() => {
     db.close();
   });
+  //db.collection('history').update({'_id': "Bon's history", 'user': 'Bon', 'messages': []})
 });
 
 // static file serving
