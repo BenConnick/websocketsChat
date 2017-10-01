@@ -202,17 +202,11 @@ const retrieveUserHistory = (user) => {
     // throw error
     if (err != null) throw("error! " + err);
     // ask the database for the history of a specific user
-    db.collection('history').find({'name': user}).then((result) => { 
-      userHistoryRecieved(result); 
-      db.close(); 
+    let history = db.collection('history').find({'name': user});
+    console.log(history);
+    db.close(); 
     });
   });
-}
-
-// user history recieved
-const userHistoryRecieved = (result) => {
-  console.log(result);
-  console.log(result.messages);
 }
 
 /*
