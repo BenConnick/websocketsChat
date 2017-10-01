@@ -205,7 +205,6 @@ const retrieveUserHistory = (user) => {
     let history = db.collection('history').find({'name': user});
     console.log(history);
     db.close(); 
-    });
   });
 }
 
