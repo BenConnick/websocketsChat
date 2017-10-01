@@ -203,10 +203,8 @@ const retrieveUserHistory = (user) => {
     if (err != null) throw("error! " + err);
     // ask the database for the history of a specific user
     let cursor = db.collection('history').find({'name': user});
-    while(cursor.hasNext()) {
-      var something = cursor.next();
-      console.log(something);
-    }
+    var cursorArray = cursor.toArray()
+    console.log(cursorArray);
     db.close(); 
   });
 }
