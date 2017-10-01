@@ -33,6 +33,9 @@ const loginUIChange = () => {
   // remove login menu
   const connect = document.querySelector("#connect");
   connect.parentNode.parentNode.removeChild(connect.parentNode);
+  // show name in header
+  const header = document.querySelector(".App-header > div");
+  header.innerHTML = partnerName;
   // show chat
   setChatVisibility(true);
 }

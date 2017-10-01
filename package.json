@@ -12,9 +12,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "websocket": "^1.0.24",
+    "apn": "^2.1.5",
+    "express": "^4.15.2",
     "socket.io": "^1.7.2",
-    "express": "^4.15.2"
+    "websocket": "^1.0.24"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"

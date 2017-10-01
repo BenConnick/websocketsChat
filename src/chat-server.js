@@ -4,6 +4,20 @@
 // path reading
 const path = require('path');
 
+// apple push notifications
+const apn = require('apn');
+
+const apnOptions = {
+  token: {
+    key: "NP9Y796BS7",
+    keyId: "PushNotificationKey",
+    teamId: "RV7QUM6JRJ"
+  },
+  production: false
+};
+
+const apnProvider = new apn.Provider(apnOptions);
+
 // static file serving
 const express = require('express');
 const app = express();
@@ -114,6 +128,21 @@ wsServer.on('request', function(request) {
                         clients[i].sendUTF(json);
                     }
                 }
+                
+                // send apple push notification
+                const deviceToken = "3e1785662e7168b17f60df1739bb28bcce3fdb10ef64a10f81b4a0e49af4be79";
+                let note = new apn.Notification();
+                note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+                note.badge = 1;
+                note.sound = "ping.aiff";
+                note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
+                note.payload = {'messageFrom': 'John Appleseed'};
+                note.topic = "com.expmaker.meowssenger";
+                apnProvider.send(note, deviceToken).then( (result) => {
+                  // see documentation for an explanation of result
+                  console.log("push notification result:");
+                  console.log(result);
+                });
                 
                 /*
                 // broadcast message to all connected clients
