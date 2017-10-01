@@ -25,18 +25,10 @@ const url2 = "mongodb://BenConnick:$4Mango@grainofsanddb-shard-00-00-hnyhc.mongo
 mongo.connect(url2, function(err, db) {
   if (err != null) throw("error! " + err);
   console.log("Successfully connected to database.");
-  db.collection('history').update(
-    {'user': 'Bon'},
-    { $set: 
-      {
-        'messages': ['modified']
-      } 
-    }
-  ).then(() => {
-    db.close();
-  });
+  db.close();
   //db.collection('history').update({'_id': "Bon's history", 'user': 'Bon', 'messages': []})
 });
+
 
 // static file serving
 const app = express();
@@ -148,6 +140,8 @@ wsServer.on('request', function(request) {
                     }
                 }
                 
+                updateMessageHistory(userName,json);
+                
                 // send apple push notification
                 const deviceToken = "3e1785662e7168b17f60df1739bb28bcce3fdb10ef64a10f81b4a0e49af4be79";
                 let note = new apn.Notification();
@@ -155,7 +149,7 @@ wsServer.on('request', function(request) {
                 note.badge = 1;
                 note.sound = "ping.aiff";
                 note.alert = "You have a new message";
-                note.payload = {'messageFrom': 'John Appleseed'};
+                note.payload = {'messageFrom': userName};
                 note.topic = "com.expmaker.meowssenger";
                 apnProvider.send(note, deviceToken).then( (result) => {
                   // see documentation for an explanation of result
@@ -207,7 +201,7 @@ const removeAll = (db, callback) => {
 
 
 // retrieve the user history
-const retrieveUserHistory = (user) => {
+const retrieveUserHistory = (userName) => {
   mongo.connect(url2, function(err, db) {
     // throw error
     if (err != null) throw("error! " + err);
@@ -219,6 +213,24 @@ const retrieveUserHistory = (user) => {
     });
     db.close(); 
   });
+}
+
+const updateMessageHistory = (userName, newMessage) => {
+  mongo.connect(url2, function(err, db) {
+  if (err != null) throw("error! " + err);
+  db.collection('history').update(
+    {'user': userName},
+    { $push: {
+        'messages': {
+          $each: [newMessage],
+          $slice: -100
+        }
+      },
+    }
+  ).then(() => {
+    db.close();
+  });
+});
 }
 
 /*
