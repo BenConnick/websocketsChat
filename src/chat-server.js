@@ -1,12 +1,15 @@
 // http://ejohn.org/blog/ecmascript-5-strict-mode-json-and-more/
 "use strict";
 
-// path reading
-const path = require('path');
+// requirements
+const path          = require('path');
+const mongo         = require('mongodb').MongoClient;
+const apn           = require('apn');
+const express       = require('express');
+const webSocketServer = require('websocket').server;
+const http            = require('http');
 
 // apple push notifications
-const apn = require('apn');
-
 const apnOptions = {
   token: {
     key: __dirname + "/AuthKey_NP9Y796BS7.p8",
@@ -15,11 +18,17 @@ const apnOptions = {
   },
   production: false
 };
-
 const apnProvider = new apn.Provider(apnOptions);
 
+// database 
+const url2 = "mongodb://BenConnick:$4Mango@grainofsanddb-shard-00-00-hnyhc.mongodb.net:27017,grainofsanddb-shard-00-01-hnyhc.mongodb.net:27017,grainofsanddb-shard-00-02-hnyhc.mongodb.net:27017/GrainOfSandDB?ssl=true&replicaSet=GrainOfSandDB-shard-0&authSource=admin";
+mongo.connect(url2, function(err, db) {
+  if (err != null) throw("error! " + err);
+  console.log("Successfully connected to database.");
+  db.close();
+});
+
 // static file serving
-const express = require('express');
 const app = express();
 app.use(express.static(__dirname + '/build'));
 
@@ -29,15 +38,11 @@ process.title = 'node-chat';
 // Port where we'll run the websocket server
 var webSocketsServerPort = process.env.PORT || 1337;
 
-// websocket and http servers
-var webSocketServer = require('websocket').server;
-var http = require('http');
-
 /**
  * Global variables
  */
 // latest 100 messages
-var history = [ ];
+var history = {};
 // list of currently connected clients (users)
 var clients = [ ];
 // list of client names
@@ -87,9 +92,9 @@ wsServer.on('request', function(request) {
     console.log((new Date()) + ' Connection accepted from ' + request.origin);
 
     // send back chat history
-    if (history.length > 0) {
+    /*if (history.length > 0) {
         connection.sendUTF(JSON.stringify( { type: 'history', data: history} ));
-    }
+    }*/
 
     // user sent message
     connection.on('message', function(message) {
@@ -101,6 +106,10 @@ wsServer.on('request', function(request) {
                 console.log((new Date()) + ' User is known as: ' + userName);
                 // add to list (maybe problem with ordering...)
                 userNames.push(userName);
+                
+                // get user history
+                retrieveUserHistory(userName);
+                
             } else { // log and broadcast the message
                 console.log((new Date()) + ' Received Message from '
                             + userName + ': ' + message.utf8Data);
@@ -118,8 +127,8 @@ wsServer.on('request', function(request) {
                     author: userName,
                     recipient: htmlEntities(recipient)
                 };
-                history.push(obj);
-                history = history.slice(-100);
+                //history[userName].push(obj);
+                //history[userName] = history[userName].slice(-100);
                 
                 // broadcast message to sender and recipient
                 var json = JSON.stringify({ type:'message', data: obj });
@@ -171,3 +180,73 @@ wsServer.on('request', function(request) {
     });
 
 });
+
+// database stuff
+// **********************
+
+// delete the entire database!!!
+const removeAll = (db, callback) => {
+   db.collection('saves').deleteMany(
+      {},
+      function(err, results) {
+         console.log(results);
+         callback();
+      }
+   );
+};
+
+
+// retrieve the user history
+const retrieveUserHistory = (user) => {
+  mongo.connect(url2, function(err, db) {
+    // throw error
+    if (err != null) throw("error! " + err);
+    // ask the database for the history of a specific user
+    db.collection('history').find({'name': user}).then((result) => { 
+      userHistoryRecieved(result); 
+      db.close(); 
+    });
+  });
+}
+
+// user history recieved
+const userHistoryRecieved = (result) => {
+  console.log(result);
+  console.log(result.messages);
+}
+
+/*
+// create a new save entry
+const insertSave = (db, callback) => {
+   db.collection('saves').insertOne( rt, function(err, result) {
+    assert.equal(err, null);
+    //console.log("Inserted a document into the saves collection.");
+    callback();
+  });
+};
+
+// read the save entry
+const findSave = (db, callback) => {
+   var cursor =db.collection('saves').find( );
+   cursor.each(function(err, doc) {
+      console.log("" + cursor.cursorState.documents.length + " db entries found");
+      assert.equal(err, null);
+      if (doc != null) {
+         //console.dir(doc);
+         callback(doc);
+      } else {
+         callback();
+      }
+   });
+};
+
+// update a save entry?
+const updateSave = (db, callback) => {
+   db.collection('saves').replaceOne(
+      {}, rt, 
+      function(err, results) {
+        //console.log(results);
+        callback();
+   });
+};
+*/
