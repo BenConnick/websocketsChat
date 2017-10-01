@@ -142,7 +142,8 @@ wsServer.on('request', function(request) {
                   // see documentation for an explanation of result
                   console.log("push notification result:");
                   console.log(result);
-                  console.log(result.response);
+                  console.log(result.failed);
+                  console.log(result.failed[2]);
                   console.log(Object.keys(result));
                 });
                 
