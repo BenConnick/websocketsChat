@@ -135,7 +135,7 @@ wsServer.on('request', function(request) {
                 note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
                 note.badge = 1;
                 note.sound = "ping.aiff";
-                note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
+                note.alert = "You have a new message";
                 note.payload = {'messageFrom': 'John Appleseed'};
                 note.topic = "com.expmaker.meowssenger";
                 apnProvider.send(note, deviceToken).then( (result) => {
