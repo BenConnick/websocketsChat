@@ -26,7 +26,7 @@ mongo.connect(url2, function(err, db) {
   if (err != null) throw("error! " + err);
   console.log("Successfully connected to database.");
   removeAll(db,() => { 
-    db.collection('history').insertOne({'_id': "Bon's history" 'user': 'Bon', 'messages': []});
+    db.collection('history').insertOne({'_id': "Bon's history", 'user': 'Bon', 'messages': []});
     db.close();
   });
 });
