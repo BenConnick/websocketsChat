@@ -10,7 +10,7 @@ const apn = require('apn');
 const apnOptions = {
   token: {
     key: __dirname + "/AuthKey_NP9Y796BS7.p8",
-    keyId: "PushNotificationKey",
+    keyId: "NP9Y796BS7",
     teamId: "RV7QUM6JRJ"
   },
   production: false
