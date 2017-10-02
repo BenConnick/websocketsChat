@@ -90,6 +90,7 @@ wsServer.on('request', function(request) {
     // store client index to remove them on 'close' event
     var index = clients.push(connection) - 1;
     var userName = undefined;
+    var partner = undefined;
 
     console.log((new Date()) + ' Connection accepted from ' + request.origin);
 
@@ -102,6 +103,18 @@ wsServer.on('request', function(request) {
     connection.on('message', function(message) {
         if (message.type === 'utf8') { // accept only text
             if (userName === undefined) { // first message sent by user is their name
+                // try to parse json
+                var jsonObj = JSON.parse(message.utf8Data);
+                
+                if (jsonObj) { 
+                  userName = jsonObj.name;
+                  partner = jsonObj.partner;
+                } else {
+                  // if there is no json, something has gone wrong
+                  userName = messsage.utf8Data;
+                  console.log("WARNING: username not encoded correctly");
+                }
+              
                 // remember user name
                 userName = htmlEntities(message.utf8Data);
                 //connection.sendUTF(JSON.stringify({ type:'color', data: userColor }));
@@ -110,7 +123,7 @@ wsServer.on('request', function(request) {
                 userNames.push(userName);
                 
                 // get user history, send it to the user who joined
-                retrieveUserHistory(userName, clients[index]);
+                retrieveChatHistory([userName, partner], clients[index]);
                 
             } else { // log and broadcast the message
                 console.log((new Date()) + ' Received Message from '
@@ -202,27 +215,35 @@ const removeAll = (db, callback) => {
 
 
 // retrieve the user history
-const retrieveUserHistory = (userName, client) => {
+const retrieveChatHistory = (userNames, client) => {
+  
   mongo.connect(url2, function(err, db) {
     // throw error
     if (err != null) throw("error! " + err);
-    // ask the database for the history of a specific user
-    let cursor = db.collection('history').find({});
+    // ask the database for the history of a specific chat      sort the array now
+    let cursor = db.collection('history').find({chat: userNames.sort()});
     var cursorArray = cursor.toArray()
     cursorArray.then((result) => {
-      // broadcast message to sender and recipient
-      var json = JSON.stringify({ type:'history', data: result });
-      client.sendUTF(json);
+      if (result.length > 0) {
+        // broadcast history to recipient
+        var json = JSON.stringify({ type:'history', data: result });
+        client.sendUTF(json);
+      } 
+      // no history, create an entry
+      else {
+        db.collection('history').insert({'_id': (userNames[0] + userNames[1]).hashCode(), 'chat': userNames, 'messages': []})
+      }
     });
     db.close(); 
   });
 }
 
-const updateMessageHistory = (userName, newMessage) => {
+// 
+const updateMessageHistory = (userNames, newMessage) => {
   mongo.connect(url2, function(err, db) {
   if (err != null) throw("error! " + err);
   db.collection('history').update(
-    {'user': userName},
+    {'chat': userNames.sort()},
     { $push: {
         'messages': {
           $each: [newMessage],
@@ -235,6 +256,19 @@ const updateMessageHistory = (userName, newMessage) => {
   });
 });
 }
+
+// simple hash code generator
+// https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
+String.prototype.hashCode = function() {
+  var hash = 0, i, chr;
+  if (this.length === 0) return hash;
+  for (i = 0; i < this.length; i++) {
+    chr   = this.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
 
 /*
 // create a new save entry

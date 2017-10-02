@@ -95,7 +95,7 @@ const connectSocket = () => {
       }
 
       //socket.emit('join', { name: user });
-      connection.send(user);
+      connection.send(JSON.stringify({"name": user, "partner": partner}));
       userName = user;
       partnerName = partner;
 
