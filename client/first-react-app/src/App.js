@@ -129,7 +129,10 @@ const connectSocket = () => {
         console.log('This doesn\'t look like a valid JSON: ', message.data);
         return;
     }
-    if (json.type === "history") return;
+    if (json.type === "history") {
+      console.log("history recieved");
+      console.log(json);
+    };
     console.log(json);
     output(json.data.author, json.data.text);
   }
@@ -192,7 +195,6 @@ const init = () => {
   ctx = canvas.getContext("2d");
   window.requestAnimationFrame(draw);
   setChatVisibility(false);
-  console.log(chat);
   
   // auto login
   const name = getCookie('userName');
@@ -471,7 +473,6 @@ class App extends Component {
     
   }
   render() {
-    console.log(this.state);
     return (
       <div className="App">
         <div className="App-header">
