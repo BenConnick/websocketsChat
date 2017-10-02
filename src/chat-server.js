@@ -154,7 +154,7 @@ wsServer.on('request', function(request) {
                 }
                 
                 // add the message to the database
-                updateMessageHistory(userName,json);
+                updateMessageHistory([userName, partner],json);
                 
                 // send apple push notification
                 const deviceToken = "3e1785662e7168b17f60df1739bb28bcce3fdb10ef64a10f81b4a0e49af4be79";
