@@ -109,8 +109,8 @@ wsServer.on('request', function(request) {
                 // add to list (maybe problem with ordering...)
                 userNames.push(userName);
                 
-                // get user history
-                retrieveUserHistory(userName);
+                // get user history, send it to the user who joined
+                retrieveUserHistory(userName, clients[index]);
                 
             } else { // log and broadcast the message
                 console.log((new Date()) + ' Received Message from '
@@ -140,6 +140,7 @@ wsServer.on('request', function(request) {
                     }
                 }
                 
+                // add the message to the database
                 updateMessageHistory(userName,json);
                 
                 // send apple push notification
@@ -201,7 +202,7 @@ const removeAll = (db, callback) => {
 
 
 // retrieve the user history
-const retrieveUserHistory = (userName) => {
+const retrieveUserHistory = (userName, client) => {
   mongo.connect(url2, function(err, db) {
     // throw error
     if (err != null) throw("error! " + err);
@@ -209,7 +210,9 @@ const retrieveUserHistory = (userName) => {
     let cursor = db.collection('history').find({});
     var cursorArray = cursor.toArray()
     cursorArray.then((result) => {
-      console.log(result);
+      // broadcast message to sender and recipient
+      var json = JSON.stringify({ type:'history', data: result });
+      client.sendUTF(json);
     });
     db.close(); 
   });
