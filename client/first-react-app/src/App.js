@@ -129,6 +129,7 @@ const connectSocket = () => {
         console.log('This doesn\'t look like a valid JSON: ', message.data);
         return;
     }
+    console.log(json);
     if (json.type === "history") {
       console.log("history recieved");
       const histArray = json.data[0].messages;
@@ -136,9 +137,9 @@ const connectSocket = () => {
         const obj = JSON.parse(histArray[i]);
         output(obj.data.author, obj.data.text);
       }
-    };
-    console.log(json);
-    output(json.data.author, json.data.text);
+    } else {
+      output(json.data.author, json.data.text);
+    }
   }
 
   // send message from the input element called message
