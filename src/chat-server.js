@@ -166,12 +166,12 @@ wsServer.on('request', function(request) {
                 note.payload = {'messageFrom': userName};
                 note.topic = "com.expmaker.meowssenger";
                 apnProvider.send(note, deviceToken).then( (result) => {
-                  // see documentation for an explanation of result
-                  console.log("push notification result:");
-                  console.log(result);
-                  console.log(result.failed);
-                  console.log(result.failed[2]);
-                  console.log(Object.keys(result));
+                  if (result.failed.length > 0) {
+                    // see documentation for an explanation of result
+                    console.log("push notification result:");
+                    console.log(result);
+                    console.log(result.failed);
+                  }
                 });
                 
                 /*
