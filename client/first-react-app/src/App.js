@@ -133,7 +133,7 @@ const connectSocket = () => {
       console.log("history recieved");
       const histArray = json.data[0].messages;
       for (let i=0; i<histArray.length; i++) {
-        const obj = JSON.parsehistArray[i];
+        const obj = JSON.parse(histArray[i]);
         output(obj.data.author, obj.data.text);
       }
     };
