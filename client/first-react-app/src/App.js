@@ -131,7 +131,10 @@ const connectSocket = () => {
     }
     if (json.type === "history") {
       console.log("history recieved");
-      console.log(json);
+      const histArray = json.data[0].messages;
+      for (let i=0; i<histArray.length; i++) {
+        output(histArray[i].data.author, histArray[i].data.text);
+      }
     };
     console.log(json);
     output(json.data.author, json.data.text);
