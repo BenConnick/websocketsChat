@@ -25,7 +25,9 @@ const url2 = "mongodb://BenConnick:$4Mango@grainofsanddb-shard-00-00-hnyhc.mongo
 mongo.connect(url2, function(err, db) {
   if (err != null) throw("error! " + err);
   console.log("Successfully connected to database.");
+  removeAll(db,() => {
   db.close();
+  });
   //db.collection('history').update({'_id': "Bon's history", 'user': 'Bon', 'messages': []})
 });
 
@@ -228,13 +230,15 @@ const retrieveChatHistory = (userNames, client) => {
         // broadcast history to recipient
         var json = JSON.stringify({ type:'history', data: result });
         client.sendUTF(json);
+        db.close(); 
       } 
       // no history, create an entry
       else {
-        db.collection('history').insert({'_id': (userNames[0] + userNames[1]).hashCode(), 'chat': userNames, 'messages': []})
+        db.collection('history').insert({'_id': (userNames[0] + userNames[1]).hashCode(), 'chat': userNames, 'messages': []}).then(() => {
+          db.close(); 
+        });
       }
     });
-    db.close(); 
   });
 }
 
