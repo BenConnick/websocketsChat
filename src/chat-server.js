@@ -25,7 +25,8 @@ const url2 = "mongodb://BenConnick:$4Mango@grainofsanddb-shard-00-00-hnyhc.mongo
 mongo.connect(url2, function(err, db) {
   if (err != null) throw("error! " + err);
   console.log("Successfully connected to database.");
-  db.close();
+  removeAll(db, ()=>{db.close();});
+  
   //db.collection('history').update({'_id': "Bon's history", 'user': 'Bon', 'messages': []})
 });
 
