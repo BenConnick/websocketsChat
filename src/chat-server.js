@@ -116,7 +116,7 @@ wsServer.on('request', function(request) {
                 }
               
                 // remember user name
-                userName = htmlEntities(message.utf8Data);
+                //userName = htmlEntities(message.utf8Data);
                 //connection.sendUTF(JSON.stringify({ type:'color', data: userColor }));
                 console.log((new Date()) + ' User is known as: ' + userName);
                 // add to list (maybe problem with ordering...)
