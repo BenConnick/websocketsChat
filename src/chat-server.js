@@ -252,7 +252,7 @@ const createOrUpdateDeviceToken = (userName, token) => {
   mongo.connect(url2, function(err, db) {
     // throw error
     if (err != null) throw("error! " + err);
-    let cursor = db.collection('tokens').find({user: userName});
+    let cursor = db.collection('tokens').find({_id: userName});
     var cursorArray = cursor.toArray();
     cursorArray.then((result) => {
       if (result.length > 0) {
