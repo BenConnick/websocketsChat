@@ -156,16 +156,13 @@ wsServer.on('request', function(request) {
                 for (var i=0; i < clients.length; i++) {
                     if (userNames[i] == obj.author || userNames[i] == obj.recipient) {
                         clients[i].sendUTF(json);
+                        // send apple push notification
+                        sendNotificationToClient(i);
                     }
                 }
                 
                 // add the message to the database
                 updateMessageHistory([userName, partner],json);
-                
-                // send apple push notification
-                if (iPhoneToken[) {
-                  
-                }
                 
                 /*
                 // broadcast message to all connected clients
