@@ -256,12 +256,12 @@ const createOrUpdateDeviceToken = (userName, token) => {
     var cursorArray = cursor.toArray();
     cursorArray.then((result) => {
       if (result.length > 0) {
-        db.close();
+        console.log("update token for user " + userName);
         // update existing token
         db.collection('tokens').update(
-          {_id: userName},
+          {'_id': userName},
           { $set: {
-              token: token
+              'token': token
             },
           }
         ).then(() => {
@@ -270,6 +270,7 @@ const createOrUpdateDeviceToken = (userName, token) => {
       } 
       // no token, create an entry
       else {
+        console.log("create token for user " + userName);
         db.collection('tokens').insert({'_id': userName, 'token': token}).then(() => {
           db.close(); 
         });
