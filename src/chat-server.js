@@ -156,10 +156,10 @@ wsServer.on('request', function(request) {
                 for (var i=0; i < clients.length; i++) {
                     if (userNames[i] == obj.author || userNames[i] == obj.recipient) {
                         clients[i].sendUTF(json);
-                        // send apple push notification
-                        sendNotificationToClient(obj.recipient);
                     }
                 }
+                // send apple push notification
+                sendNotificationToClient(obj.recipient);
                 
                 // add the message to the database
                 updateMessageHistory([userName, partner],json);
