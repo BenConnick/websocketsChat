@@ -290,8 +290,8 @@ const retrieveDeviceToken = (userName, callback) => {
     cursorArray.then((result) => {
       if (result.length > 0) {
         console.log(result);
-        console.log(result.token);
-        callback(result.token, userName);
+        console.log(result[0].token);
+        callback(result[0].token, userName);
         db.close();
       } 
       // no history, create an entry
