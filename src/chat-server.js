@@ -285,7 +285,7 @@ const retrieveDeviceToken = (userName, callback) => {
     // throw error
     if (err != null) throw("error! " + err);
     // ask the database for the token of a user
-    let cursor = db.collection('tokens').find({user: userName});
+    let cursor = db.collection('tokens').find({_id: userName});
     var cursorArray = cursor.toArray();
     cursorArray.then((result) => {
       if (result.length > 0) {
