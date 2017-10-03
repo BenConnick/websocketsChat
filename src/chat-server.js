@@ -250,7 +250,7 @@ const updateMessageHistory = (userNames, newMessage) => {
 
 const createOrUpdateDeviceToken = (userName, token) => {
   let cursor = db.collection('tokens').find({user: userName});
-    var cursorArray = cursor.toArray()
+    var cursorArray = cursor.toArray();
     cursorArray.then((result) => {
       if (result.length > 0) {
         db.close();
@@ -281,7 +281,7 @@ const retrieveDeviceToken = (userName, callback) => {
     if (err != null) throw("error! " + err);
     // ask the database for the token of a user
     let cursor = db.collection('tokens').find({user: userName});
-    var cursorArray = cursor.toArray()
+    var cursorArray = cursor.toArray();
     cursorArray.then((result) => {
       if (result.length > 0) {
         callback(result.token, userName);
@@ -292,6 +292,7 @@ const retrieveDeviceToken = (userName, callback) => {
         console.log("No device token found for name " + userName); 
       }
     });
+  });
 }
 
 // Push Notifications
