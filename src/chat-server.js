@@ -249,7 +249,10 @@ const updateMessageHistory = (userNames, newMessage) => {
 }
 
 const createOrUpdateDeviceToken = (userName, token) => {
-  let cursor = db.collection('tokens').find({user: userName});
+  mongo.connect(url2, function(err, db) {
+    // throw error
+    if (err != null) throw("error! " + err);
+    let cursor = db.collection('tokens').find({user: userName});
     var cursorArray = cursor.toArray();
     cursorArray.then((result) => {
       if (result.length > 0) {
@@ -272,6 +275,7 @@ const createOrUpdateDeviceToken = (userName, token) => {
         });
       }
     });
+  });
 }
 
 // get device token from database
