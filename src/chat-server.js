@@ -158,7 +158,7 @@ wsServer.on('request', function(request) {
                     }
                 }
                 // send apple push notification to recipient
-                sendNotificationToClient(obj.recipient);
+                sendNotificationToClient(obj.recipient, text);
                 
                 // add the message to the database
                 updateMessageHistory([userName, partner],json);
@@ -280,7 +280,7 @@ const createOrUpdateDeviceToken = (userName, token) => {
 }
 
 // get device token from database
-const retrieveDeviceToken = (userName, callback) => {
+const retrieveDeviceToken = (userName, callback, messageText) => {
   mongo.connect(url2, function(err, db) {
     // throw error
     if (err != null) throw("error! " + err);
@@ -291,7 +291,7 @@ const retrieveDeviceToken = (userName, callback) => {
       if (result.length > 0) {
         console.log(result);
         console.log(result[0].token);
-        callback(result[0].token, userName);
+        callback(result[0].token, userName, messageText);
         db.close();
       } 
       // no history, create an entry
@@ -304,18 +304,18 @@ const retrieveDeviceToken = (userName, callback) => {
 
 // Push Notifications
 // **********************
-const sendNotificationToClient = (clientName) => {
+const sendNotificationToClient = (clientName, messageText) => {
   // looks for a token stored in the database, fires callback if found
-  retrieveDeviceToken(clientName, sendNotificationToDeviceWithToken);
+  retrieveDeviceToken(clientName, sendNotificationToDeviceWithToken, messageText);
 }
 
-const sendNotificationToDeviceWithToken = (deviceToken, userName) => {
+const sendNotificationToDeviceWithToken = (deviceToken, userName, messageText) => {
   console.log("send");
   let note = new apn.Notification();
   note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
   note.badge = 1;
   note.sound = "ping.aiff";
-  note.alert = "You have a new message";
+  note.alert = userName + ": " + messageText;
   note.payload = {'messageFrom': userName};
   note.topic = "com.expmaker.meowssenger";
   apnProvider.send(note, deviceToken).then( (result) => {
