@@ -157,7 +157,7 @@ wsServer.on('request', function(request) {
                     if (userNames[i] == obj.author || userNames[i] == obj.recipient) {
                         clients[i].sendUTF(json);
                         // send apple push notification
-                        sendNotificationToClient(i);
+                        sendNotificationToClient(userNames[i]);
                     }
                 }
                 
