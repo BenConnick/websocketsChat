@@ -49,8 +49,6 @@ var history = {};
 var clients = [ ];
 // list of client names
 var userNames = [ ];
-// dictionary of client device tokens
-var iPhoneTokens = {};
 
 /**
  * Helper function for escaping input strings
@@ -112,7 +110,8 @@ wsServer.on('request', function(request) {
                   userName = jsonObj.name;
                   partner = jsonObj.partner;
                   // use device token for push notifications
-                  iPhoneTokens[userName] = jsonObj.deviceToken;
+                  if (jsonObj.deviceToken) 
+                    createOrUpdateDeviceToken(userName, jsonObj.deviceToken);
                   
                 } else {
                   // if there is no json, something has gone wrong
@@ -158,7 +157,7 @@ wsServer.on('request', function(request) {
                         clients[i].sendUTF(json);
                     }
                 }
-                // send apple push notification
+                // send apple push notification to recipient
                 sendNotificationToClient(obj.recipient);
                 
                 // add the message to the database
@@ -249,13 +248,57 @@ const updateMessageHistory = (userNames, newMessage) => {
 });
 }
 
+const createOrUpdateDeviceToken = (userName, token) => {
+  let cursor = db.collection('tokens').find({user: userName});
+    var cursorArray = cursor.toArray()
+    cursorArray.then((result) => {
+      if (result.length > 0) {
+        db.close();
+        // update existing token
+        db.collection('tokens').update(
+          {_id: userName},
+          { $set: {
+              token: token
+            },
+          }
+        ).then(() => {
+          db.close();
+        });
+      } 
+      // no token, create an entry
+      else {
+        db.collection('tokens').insert({'_id': userName, 'token': token}).then(() => {
+          db.close(); 
+        });
+      }
+    });
+}
+
+// get device token from database
+const retrieveDeviceToken = (userName, callback) => {
+  mongo.connect(url2, function(err, db) {
+    // throw error
+    if (err != null) throw("error! " + err);
+    // ask the database for the token of a user
+    let cursor = db.collection('tokens').find({user: userName});
+    var cursorArray = cursor.toArray()
+    cursorArray.then((result) => {
+      if (result.length > 0) {
+        callback(result.token, userName);
+        db.close();
+      } 
+      // no history, create an entry
+      else {
+        console.log("No device token found for name " + userName); 
+      }
+    });
+}
+
 // Push Notifications
 // **********************
 const sendNotificationToClient = (clientName) => {
-  console.log(iPhoneTokens);
-  const token = iPhoneTokens[clientName];
-  console.log(token)
-  if (token) sendNotificationToDeviceWithToken(token, clientName);
+  // looks for a token stored in the database, fires callback if found
+  retrieveDeviceToken(clientName, sendNotificationToDeviceWithToken);
 }
 
 const sendNotificationToDeviceWithToken = (deviceToken, userName) => {
