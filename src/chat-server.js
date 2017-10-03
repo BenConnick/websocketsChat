@@ -158,7 +158,7 @@ wsServer.on('request', function(request) {
                     }
                 }
                 // send apple push notification to recipient
-                sendNotificationToClient(obj.recipient, text);
+                sendNotificationToClient(obj.recipient, obj);
                 
                 // add the message to the database
                 updateMessageHistory([userName, partner],json);
@@ -280,7 +280,7 @@ const createOrUpdateDeviceToken = (userName, token) => {
 }
 
 // get device token from database
-const retrieveDeviceToken = (userName, callback, messageText) => {
+const retrieveDeviceToken = (userName, callback, messageObj) => {
   mongo.connect(url2, function(err, db) {
     // throw error
     if (err != null) throw("error! " + err);
@@ -291,7 +291,7 @@ const retrieveDeviceToken = (userName, callback, messageText) => {
       if (result.length > 0) {
         console.log(result);
         console.log(result[0].token);
-        callback(result[0].token, userName, messageText);
+        callback(result[0].token, userName, messageObj);
         db.close();
       } 
       // no history, create an entry
@@ -304,18 +304,18 @@ const retrieveDeviceToken = (userName, callback, messageText) => {
 
 // Push Notifications
 // **********************
-const sendNotificationToClient = (clientName, messageText) => {
+const sendNotificationToClient = (clientName, messageObj) => {
   // looks for a token stored in the database, fires callback if found
-  retrieveDeviceToken(clientName, sendNotificationToDeviceWithToken, messageText);
+  retrieveDeviceToken(clientName, sendNotificationToDeviceWithToken, messageObj);
 }
 
-const sendNotificationToDeviceWithToken = (deviceToken, userName, messageText) => {
+const sendNotificationToDeviceWithToken = (deviceToken, userName, messageObj) => {
   console.log("send");
   let note = new apn.Notification();
   note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
   note.badge = 1;
   note.sound = "ping.aiff";
-  note.alert = userName + ": " + messageText;
+  note.alert = messageObj.author + ": " + messageObj.text;
   note.payload = {'messageFrom': userName};
   note.topic = "com.expmaker.meowssenger";
   apnProvider.send(note, deviceToken).then( (result) => {
