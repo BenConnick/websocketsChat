@@ -289,6 +289,8 @@ const retrieveDeviceToken = (userName, callback) => {
     var cursorArray = cursor.toArray();
     cursorArray.then((result) => {
       if (result.length > 0) {
+        console.log(result);
+        console.log(result.token);
         callback(result.token, userName);
         db.close();
       } 
