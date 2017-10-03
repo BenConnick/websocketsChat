@@ -49,8 +49,8 @@ var history = {};
 var clients = [ ];
 // list of client names
 var userNames = [ ];
-// list of client device tokens
-var iPhoneTokens = [ ];
+// dictionary of client device tokens
+var iPhoneTokens = {};
 
 /**
  * Helper function for escaping input strings
@@ -112,7 +112,7 @@ wsServer.on('request', function(request) {
                   userName = jsonObj.name;
                   partner = jsonObj.partner;
                   // use device token for push notifications
-                  iPhoneTokens.push(jsonObj.deviceToken);
+                  iPhoneTokens[userName] = jsonObj.deviceToken;
                   
                 } else {
                   // if there is no json, something has gone wrong
@@ -251,12 +251,15 @@ const updateMessageHistory = (userNames, newMessage) => {
 
 // Push Notifications
 // **********************
-const sendNotificationToClient = (clientIndex) => {
-  const token = iPhoneTokens[clientIndex];
-  if (token) sendNotificationToDeviceWithToken(token);
+const sendNotificationToClient = (clientName) => {
+  console.log(iPhoneTokens);
+  const token = iPhoneTokens[clientName];
+  console.log(token)
+  if (token) sendNotificationToDeviceWithToken(token, clientName);
 }
 
-const sendNotificationToDeviceWithToken = (deviceToken) => {
+const sendNotificationToDeviceWithToken = (deviceToken, userName) => {
+  console.log("send");
   let note = new apn.Notification();
   note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
   note.badge = 1;
