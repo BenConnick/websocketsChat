@@ -150,13 +150,24 @@ wsServer.on('request', function(request) {
                     recipient: htmlEntities(recipient)
                 };
 
+                // add this message to numUnread
+                numUnread++;
+
                 // broadcast message to sender and recipient
                 var json = JSON.stringify({ type:'message', data: obj });
                 for (var i=0; i < clients.length; i++) {
-                    if (userNames[i] == obj.author || userNames[i] == obj.recipient) {
-                        clients[i].sendUTF(json);
+                    if (userNames[i] == obj.author) {
+                      // reset num unread when you respond
+                      if (userNames[i] == userName) {
+                        numUnread = 0;
+                      }
+                      clients[i].sendUTF(json);
+                    }
+                    if (userNames[i] == obj.recipient) {
+                      clients[i].sendUTF(json);
                     }
                 }
+
                 // send apple push notification to recipient
                 sendNotificationToClient(obj.recipient, obj, numUnread);
 
