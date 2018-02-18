@@ -16,7 +16,8 @@
     "express": "^4.15.2",
     "mongodb": "^2.2.31",
     "socket.io": "^1.7.2",
-    "websocket": "^1.0.24"
+    "websocket": "^1.0.24",
+    "sjcl": "^1.0"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"

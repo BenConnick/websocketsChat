@@ -8,6 +8,7 @@ const apn           = require('apn');
 const express       = require('express');
 const webSocketServer = require('websocket').server;
 const http            = require('http');
+const sjcl          = require('sjcl');
 
 // apple push notifications
 const apnOptions = {
@@ -20,7 +21,7 @@ const apnOptions = {
 };
 const apnProvider = new apn.Provider(apnOptions);
 
-// database 
+// database
 const url2 = "mongodb://BenConnick:$4Mango@grainofsanddb-shard-00-00-hnyhc.mongodb.net:27017,grainofsanddb-shard-00-01-hnyhc.mongodb.net:27017,grainofsanddb-shard-00-02-hnyhc.mongodb.net:27017/GrainOfSandDB?ssl=true&replicaSet=GrainOfSandDB-shard-0&authSource=admin";
 mongo.connect(url2, function(err, db) {
   if (err != null) throw("error! " + err);
@@ -86,11 +87,12 @@ var wsServer = new webSocketServer({
 wsServer.on('request', function(request) {
     console.log((new Date()) + ' Connection from origin ' + request.origin + '.');
     // accept connection
-    var connection = request.accept(null, request.origin); 
+    var connection = request.accept(null, request.origin);
     // store client index to remove them on 'close' event
     var index = clients.push(connection) - 1;
     var userName = undefined;
     var partner = undefined;
+    var numUnread = 0;
 
     console.log((new Date()) + ' Connection accepted from ' + request.origin);
 
@@ -105,20 +107,20 @@ wsServer.on('request', function(request) {
             if (userName === undefined) { // first message sent by user is their name
                 // try to parse json
                 var jsonObj = JSON.parse(message.utf8Data);
-                
-                if (jsonObj) { 
+
+                if (jsonObj) {
                   userName = jsonObj.name;
                   partner = jsonObj.partner;
                   // use device token for push notifications
-                  if (jsonObj.deviceToken) 
+                  if (jsonObj.deviceToken)
                     createOrUpdateDeviceToken(userName, jsonObj.deviceToken);
-                  
+
                 } else {
                   // if there is no json, something has gone wrong
                   userName = messsage.utf8Data;
                   console.log("WARNING: username not encoded correctly");
                 }
-              
+
                 // remember user name
                 //userName = htmlEntities(message.utf8Data);
                 //connection.sendUTF(JSON.stringify({ type:'color', data: userColor }));
@@ -126,20 +128,20 @@ wsServer.on('request', function(request) {
                 console.log((new Date()) + ' User is known as: ' + userName);
                 // add to list (maybe problem with ordering...)
                 userNames.push(userName);
-                
+
                 // get user history, send it to the user who joined
                 retrieveChatHistory([userName, partner], clients[index]);
-                
+
             } else { // log and broadcast the message
                 console.log((new Date()) + ' Received Message from '
                             + userName + ': ' + message.utf8Data);
-                            
+
                 // try to parse json
                 var jsonObj = JSON.parse(message.utf8Data);
                 // if there is no json, then the message is the text
                 var text = jsonObj? jsonObj.text : message.uft8Data;
                 var recipient = jsonObj? jsonObj.recipient : userName;
-                
+
                 // we want to keep history of all sent messages
                 var obj = {
                     time: (new Date()).getTime(),
@@ -147,9 +149,7 @@ wsServer.on('request', function(request) {
                     author: userName,
                     recipient: htmlEntities(recipient)
                 };
-                //history[userName].push(obj);
-                //history[userName] = history[userName].slice(-100);
-                
+
                 // broadcast message to sender and recipient
                 var json = JSON.stringify({ type:'message', data: obj });
                 for (var i=0; i < clients.length; i++) {
@@ -158,19 +158,11 @@ wsServer.on('request', function(request) {
                     }
                 }
                 // send apple push notification to recipient
-                sendNotificationToClient(obj.recipient, obj);
-                
+                sendNotificationToClient(obj.recipient, obj, numUnread);
+
                 // add the message to the database
                 updateMessageHistory([userName, partner],json);
-                
-                /*
-                // broadcast message to all connected clients
-                var json = JSON.stringify({ type:'message', data: obj });
-                for (var i=0; i < clients.length; i++) {
-                    clients[i].sendUTF(json);
-                }
-                */
-                
+
             }
         }
     });
@@ -205,7 +197,7 @@ const removeAll = (db, callback) => {
 
 // retrieve the user history
 const retrieveChatHistory = (userNames, client) => {
-  
+
   mongo.connect(url2, function(err, db) {
     // throw error
     if (err != null) throw("error! " + err);
@@ -217,12 +209,12 @@ const retrieveChatHistory = (userNames, client) => {
         // broadcast history to recipient
         var json = JSON.stringify({ type:'history', data: result });
         client.sendUTF(json);
-        db.close(); 
-      } 
+        db.close();
+      }
       // no history, create an entry
       else {
         db.collection('history').insert({'_id': (userNames[0] + userNames[1]).hashCode(), 'chat': userNames, 'messages': []}).then(() => {
-          db.close(); 
+          db.close();
         });
       }
     });
@@ -267,12 +259,12 @@ const createOrUpdateDeviceToken = (userName, token) => {
         ).then(() => {
           db.close();
         });
-      } 
+      }
       // no token, create an entry
       else {
         console.log("create token for user " + userName);
         db.collection('tokens').insert({'_id': userName, 'token': token}).then(() => {
-          db.close(); 
+          db.close();
         });
       }
     });
@@ -280,7 +272,7 @@ const createOrUpdateDeviceToken = (userName, token) => {
 }
 
 // get device token from database
-const retrieveDeviceToken = (userName, callback, messageObj) => {
+const retrieveDeviceToken = (userName, callback, messageObj, numUnread) => {
   mongo.connect(url2, function(err, db) {
     // throw error
     if (err != null) throw("error! " + err);
@@ -291,12 +283,12 @@ const retrieveDeviceToken = (userName, callback, messageObj) => {
       if (result.length > 0) {
         console.log(result);
         console.log(result[0].token);
-        callback(result[0].token, userName, messageObj);
+        callback(result[0].token, userName, messageObj, numUnread);
         db.close();
-      } 
+      }
       // no history, create an entry
       else {
-        console.log("No device token found for name " + userName); 
+        console.log("No device token found for name " + userName);
       }
     });
   });
@@ -304,16 +296,16 @@ const retrieveDeviceToken = (userName, callback, messageObj) => {
 
 // Push Notifications
 // **********************
-const sendNotificationToClient = (clientName, messageObj) => {
+const sendNotificationToClient = (clientName, messageObj, numUnread) => {
   // looks for a token stored in the database, fires callback if found
-  retrieveDeviceToken(clientName, sendNotificationToDeviceWithToken, messageObj);
+  retrieveDeviceToken(clientName, sendNotificationToDeviceWithToken, messageObj, numUnread);
 }
 
-const sendNotificationToDeviceWithToken = (deviceToken, userName, messageObj) => {
+const sendNotificationToDeviceWithToken = (deviceToken, userName, messageObj, numUnread) => {
   console.log("send");
   let note = new apn.Notification();
   note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-  note.badge = 1;
+  note.badge = numUnread;
   note.sound = "ping.aiff";
   note.alert = messageObj.author + ": " + messageObj.text;
   note.payload = {'messageFrom': userName};
@@ -374,7 +366,7 @@ const findSave = (db, callback) => {
 // update a save entry?
 const updateSave = (db, callback) => {
    db.collection('saves').replaceOne(
-      {}, rt, 
+      {}, rt,
       function(err, results) {
         //console.log(results);
         callback();
