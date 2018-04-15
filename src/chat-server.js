@@ -311,7 +311,7 @@ const sendNotificationToClient = (clientName, messageObj, numUnread) => {
 }
 
 const sendNotificationToDeviceWithToken = (deviceToken, userName, messageObj, numUnread) => {
-  if (deviceToken.length > 15) {
+  if (deviceToken.length < 65) {
     sendAppleNotification(deviceToken, messageObj.author, messageObj.text, numUnread);
   } else {
     sendAndroidNotification(deviceToken, messageObj.author, messageObj.text, numUnread);
