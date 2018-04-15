@@ -93,9 +93,22 @@ const connectSocket = () => {
       if(!user) {
         user = 'unknown';
       }
+	  
+	  // the first message establishes the identity of the connected client
+	  let firstMessage = {"name": user, "partner": partner};
+	  
+	  let deviceToken = undefined;
+	  if (Android) {
+		  deviceToken = Android.getIDFromAndroid();
+		  if (deviceToken) {
+			firstMessage = {"name": user, "partner": partner, "deviceToken": deviceToken};
+		  }
+	  } else {
+		  console.log("failed to get device token");
+	  }
 
       //socket.emit('join', { name: user });
-      connection.send(JSON.stringify({"name": user, "partner": partner}));
+      connection.send(JSON.stringify(firstMessage));
       userName = user;
       partnerName = partner;
 
