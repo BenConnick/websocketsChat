@@ -14,10 +14,11 @@
   "dependencies": {
     "apn": "^2.1.5",
     "express": "^4.15.2",
+    "firebase-admin": "^5.12.0",
     "mongodb": "^2.2.31",
+    "sjcl": "^1.0",
     "socket.io": "^1.7.2",
-    "websocket": "^1.0.24",
-    "sjcl": "^1.0"
+    "websocket": "^1.0.24"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"
