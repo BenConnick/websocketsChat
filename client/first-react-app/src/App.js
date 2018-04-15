@@ -78,10 +78,10 @@ const connectSocket = () => {
 
   const messageInput = document.querySelector("#message");
   //chat = document.querySelector("#chat");
-  
+
   // open connection
   connection = new WebSocket('ws://meowssenger.herokuapp.com');
-  
+
   if (!connection) alert("uh oh, there's a problem");
 
   connection.onopen = function () {
@@ -93,15 +93,15 @@ const connectSocket = () => {
       if(!user) {
         user = 'unknown';
       }
-	  
+
 	  // the first message establishes the identity of the connected client
 	  let firstMessage = {"name": user, "partner": partner};
-	  
+
 	  let deviceToken = undefined;
-	  if (Android) {
-		  deviceToken = Android.getIDFromAndroid();
+	  if (window.Android && window.Android.getIDFromAndroid) {
+		  deviceToken = window.Android.getIDFromAndroid();
 		  if (deviceToken) {
-			firstMessage = {"name": user, "partner": partner, "deviceToken": deviceToken};
+			     firstMessage = {"name": user, "partner": partner, "deviceToken": deviceToken};
 		  }
 	  } else {
 		  console.log("failed to get device token");
@@ -127,13 +127,13 @@ const connectSocket = () => {
     // set user name
     userName = document.querySelector("#username").value;
     // set partner name
-    
+
     // change from login to chat
     loginUIChange();
     // display message
     output('Error', 'Connection failed. You are offline. ' + error);
   };
-  
+
   connection.onmessage = function (message) {
     let json = "";
     try {
@@ -173,7 +173,7 @@ const connectSocket = () => {
     connection.send('{"recipient":"'+partnerName+'","text":"'+messageInput.value+'"}');
     messageInput.value = "";
   }
-  
+
   sendMessage = (msg) => {
     messageInput.value = msg;
     sendMsgFromInput();
@@ -197,7 +197,7 @@ const connectSocket = () => {
 
 const output = (sourceName, msg) => {
   // handle animaiton
-  checkForAnim(msg,(sourceName === userName)); 
+  checkForAnim(msg,(sourceName === userName));
   const m = { own: (sourceName === userName), text: msg };
   chat.setState({messages: chat.state.messages.concat([m])});
 };
@@ -213,7 +213,7 @@ const init = () => {
   ctx = canvas.getContext("2d");
   window.requestAnimationFrame(draw);
   setChatVisibility(false);
-  
+
   // auto login
   const name = getCookie('userName');
   const partner = getCookie('partnerName');
@@ -312,7 +312,7 @@ class Cat {
     this.y = 120;
     this.flipped = false;
   }
-  
+
   update(dt) {
     // update animation
     this.anim.progress += dt;
@@ -321,14 +321,14 @@ class Cat {
       if (this.anim.progress > frameTime) {
         const reduction = (frameTime * Math.floor(this.anim.progress / frameTime));
         this.anim.progress -= reduction;
-        this.anim.frameNum = (this.anim.frameNum + 1);  
+        this.anim.frameNum = (this.anim.frameNum + 1);
         if (this.anim.frameNum >= this.anim.frames.length) {
           this.anim.frameNum = this.anim.loopToFrameNum;
         }
       }
     }
   }
-  
+
   draw() {
     const w = this.frameWidth;
     const frame = (this.anim.frames[this.anim.frameNum] + this.anim.startFrame);
@@ -341,7 +341,7 @@ class Cat {
     ctx.save();
     ctx.translate(this.x,this.y);
     if (this.flipped) {
-      ctx.scale(-1,1);  
+      ctx.scale(-1,1);
     }
     ctx.drawImage(this.anim.srcImg, sx, sy, w, w, dx, dy, dWidth, dHeight);
     ctx.restore();
@@ -362,7 +362,7 @@ const draw = () => {
   // draw cat 1
   cat1.update(dt);
   cat1.draw();
-  
+
   cat2.update(dt);
   cat2.draw();
   window.requestAnimationFrame(draw);
@@ -410,7 +410,7 @@ class Chat extends Component {
       }
       count++;
     })
-    return (  
+    return (
       <div id="chat" className={this.props.className}>
       {
         messages
@@ -431,10 +431,10 @@ class Cats extends Component {
 class StickerButton extends Component {
   render() {
     return (
-      <div className="stickerBtn" 
+      <div className="stickerBtn"
         style={{
           backgroundImage: "url("+this.props.url+")"
-        }} 
+        }}
         onClick={() => {
           sendMessage("*"+this.props.anim+"*");
           this.props.toggleMenu();
@@ -473,9 +473,9 @@ class App extends Component {
     super(props);
     const numbers = [0,1,2,3];
     const listItems = numbers.map((number) => {
-      return <StickerButton 
-        key={number} 
-        anim={animationNames[number]} 
+      return <StickerButton
+        key={number}
+        anim={animationNames[number]}
         url={thumbnails[number]}
         toggleMenu={() => {this.toggleStickerMenu();}}
         />
@@ -488,7 +488,7 @@ class App extends Component {
       showStickers: false,
       stickerButtons: listItems,
     };
-    
+
   }
   render() {
     return (
@@ -505,7 +505,7 @@ class App extends Component {
           <StickerModeButton onClick={() => {this.toggleStickerMenu();}}/>
           <div id="send">send</div>
         </div>
-        <Chat 
+        <Chat
           // assign the chat variable
           ref={(c) => { chat = c; }}
           className={this.state.chatClass}
