@@ -2,13 +2,21 @@
 "use strict";
 
 // requirements
-const path          = require('path');
-const mongo         = require('mongodb').MongoClient;
-const apn           = require('apn');
-const express       = require('express');
+const path            = require('path');
+const mongo           = require('mongodb').MongoClient;
+const apn             = require('apn');
+const express         = require('express');
 const webSocketServer = require('websocket').server;
 const http            = require('http');
-const sjcl          = require('sjcl');
+const sjcl            = require('sjcl');
+const firebase        = require('firebase-admin');
+const serviceAccount  = require('./firebaseServiceAccountKey.json');
+
+// android push notifications
+const firebaseApp = firebase.initializeApp({
+  credential: firebase.credential.cert(serviceAccount)
+});
+const androidMessaging = firebase.messaging(firebaseApp);
 
 // apple push notifications
 const apnOptions = {
@@ -27,7 +35,6 @@ mongo.connect(url2, function(err, db) {
   if (err != null) throw("error! " + err);
   console.log("Successfully connected to database.");
   db.close();
-  //db.collection('history').update({'_id': "Bon's history", 'user': 'Bon', 'messages': []})
 });
 
 
@@ -64,14 +71,7 @@ function htmlEntities(str) {
  */
 
 var server = app.listen(webSocketsServerPort);
-/*var server = http.createServer(function(request, response) {
-    // TODO: serve static web page
-    //response.sendFile(path.resolve('src/build/index.html'));
-});*/
 console.log((new Date()) + " Server is listening on port " + webSocketsServerPort);
-/*server.listen(webSocketsServerPort, function() {
-    //console.log((new Date()) + " Server is listening on port " + webSocketsServerPort);
-});*/
 
 /**
  * WebSocket server
@@ -122,8 +122,6 @@ wsServer.on('request', function(request) {
                 }
 
                 // remember user name
-                //userName = htmlEntities(message.utf8Data);
-                //connection.sendUTF(JSON.stringify({ type:'color', data: userColor }));
                 console.log(message.utf8Data);
                 console.log((new Date()) + ' User is known as: ' + userName);
                 // add to list (maybe problem with ordering...)
@@ -313,13 +311,21 @@ const sendNotificationToClient = (clientName, messageObj, numUnread) => {
 }
 
 const sendNotificationToDeviceWithToken = (deviceToken, userName, messageObj, numUnread) => {
+  if (deviceToken.length > 15) {
+    sendAppleNotification(deviceToken, messageObj.author, messageObj.text, numUnread);
+  } else {
+    sendAndroidNotification(deviceToken, messageObj.author, messageObj.text, numUnread);
+  }
+}
+
+const sendAppleNotification = (deviceToken, author, message, numUnread) => {
   console.log("send");
   let note = new apn.Notification();
   note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
   note.badge = numUnread;
   note.sound = "ping.aiff";
-  note.alert = messageObj.author + ": " + messageObj.text;
-  note.payload = {'messageFrom': userName};
+  note.alert = author + ": " + message;
+  note.payload = {'messageFrom': author};
   note.topic = "com.expmaker.meowssenger";
   apnProvider.send(note, deviceToken).then( (result) => {
     if (result.failed.length > 0) {
@@ -331,7 +337,26 @@ const sendNotificationToDeviceWithToken = (deviceToken, userName, messageObj, nu
   });
 }
 
+const sendAndroidNotification = (deviceToken, author, message, numUnread) => {
+  console.log("send");
 
+  var payload = {
+    notification: {
+      title: author,
+      body: message
+    }
+  }
+  var options = {
+    priority: "normal"
+    //timeToLive: four weeks (the default)
+  }
+  androidMessaging.sendToDevice(deviceToken, payload, options)
+    .then(function(response) {
+      console.log("Successfully sent android notif", response);
+    }).catch(function(error) {
+      console.log("Error sending android notif", error);
+    });
+}
 
 // Misc
 // **********************
