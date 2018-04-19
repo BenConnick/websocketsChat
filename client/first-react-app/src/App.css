@@ -198,7 +198,7 @@ canvas {
   bottom: 0em;
 }
 
-.hyphenate {
+.hyphenate span {
   /* Careful, this breaks the word wherever it is without a hyphen */
   overflow-wrap: break-word;
   word-wrap: break-word;
