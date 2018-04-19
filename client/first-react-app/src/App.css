@@ -135,6 +135,15 @@ canvas {
 .message span {
   background-color: #a1a38e;
   display: inline-block;
+  max-width: 80vw;
+
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  /* Adds a hyphen where the word breaks */
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
 }
 
 .sendMessageBar {
@@ -196,18 +205,6 @@ canvas {
 
 .stickerMenu.raised {
   bottom: 0em;
-}
-
-.hyphenate span {
-  /* Careful, this breaks the word wherever it is without a hyphen */
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-
-  /* Adds a hyphen where the word breaks */
-  -webkit-hyphens: auto;
-  -ms-hyphens: auto;
-  -moz-hyphens: auto;
-  hyphens: auto;
 }
 
 #chat {
