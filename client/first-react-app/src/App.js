@@ -374,7 +374,7 @@ const draw = () => {
 // ----------------------------------------------
 
 function Message(props) {
-  let className = props.own ? "message own" : "message";
+  let className = "message hyphenate" + (props.own ? " own" : "");
   let parentClassName = props.own ? "messageContainer own" : "messageContainer";
 
   return (

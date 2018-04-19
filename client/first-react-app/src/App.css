@@ -35,7 +35,7 @@ textarea {
   color: white;
   text-align: center;
   font-size: 1em;
-  
+
 }
 
 .App-intro {
@@ -66,7 +66,7 @@ canvas {
 .cats {
   position: absolute;
   bottom: 1.5em;
-  width: 100%; 
+  width: 100%;
   pointer-events: none;
   z-index: 10;
 }
@@ -140,7 +140,7 @@ canvas {
 .sendMessageBar {
   position: absolute;
   bottom: 0em;
-  width: 100%; 
+  width: 100%;
   height: 1.5em;
   overflow: hidden;
 }
@@ -151,7 +151,7 @@ canvas {
 }
 
 .sendMessageBar input {
-  width: 65%; 
+  width: 65%;
   height: 100%;
   font-size: 1em;
   border: none;
@@ -196,6 +196,18 @@ canvas {
 
 .stickerMenu.raised {
   bottom: 0em;
+}
+
+.hyphenate {
+  /* Careful, this breaks the word wherever it is without a hyphen */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  /* Adds a hyphen where the word breaks */
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
 }
 
 #chat {
