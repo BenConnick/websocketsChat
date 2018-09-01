@@ -396,7 +396,6 @@ class Chat extends Component {
     this.state = { messages: [] }
   }
   componentDidUpdate (prevProps, prevState) {
-    // innefficient, need to find better way
     document.querySelector("#chat").scrollTop = 100000000;
   }
   render() {

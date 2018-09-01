@@ -211,7 +211,7 @@ canvas {
   display: block;
   margin: 0% 4%;
   font-size: 0.75em;
-  height: 60%;
+  height: calc(100vh - 65px - 2em);
   width: 94%;
   overflow-y: scroll;
 }
