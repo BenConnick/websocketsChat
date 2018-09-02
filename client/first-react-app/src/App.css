@@ -211,7 +211,9 @@ canvas {
   display: block;
   margin: 0% 4%;
   font-size: 0.75em;
-  height: calc(100vh - 65px - 1.5em - 25vw);
+  /* screen height - header height (with pad) - send bar height - cat image height - bottom padding */
+  height: calc(100vh - 65px - 1.5em - 25vw - 10vh);
+  padding-bottom: 10vh;
   width: 94%;
   overflow-y: scroll;
 }
@@ -252,8 +254,8 @@ canvas {
   background-size: 100% 100%;
   position: absolute;
   width: 100%;
-  height: 5vh;
-  bottom: calc(1.5em + 25vw - 5vh);
+  height: 10vh;
+  bottom: calc(1.5em + 25vw - 5vh - 12px);
   left: 0px;
 }
 
