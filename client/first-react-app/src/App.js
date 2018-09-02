@@ -100,10 +100,11 @@ const connectSocket = () => {
   	  let deviceToken = undefined;
   	  if (window.Android && window.Android.getIDFromAndroid) {
   		  deviceToken = window.Android.getIDFromAndroid();
-  		  if (deviceToken) {
+        log("deviceToken: " + deviceToken);
+  		  if (deviceToken !== undefined) {
   			     firstMessage = {"name": user, "partner": partner, "deviceToken": deviceToken};
   		  } else {
-          log("deviceToken evaulated to false");
+          log("deviceToken evaulated to undefined");
         }
   	  } else {
   		  log("failed to get device token");
