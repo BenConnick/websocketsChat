@@ -102,7 +102,9 @@ const connectSocket = () => {
   		  deviceToken = window.Android.getIDFromAndroid();
   		  if (deviceToken) {
   			     firstMessage = {"name": user, "partner": partner, "deviceToken": deviceToken};
-  		  }
+  		  } else {
+          log("deviceToken evaulated to false");
+        }
   	  } else {
   		  log("failed to get device token");
   	  }
