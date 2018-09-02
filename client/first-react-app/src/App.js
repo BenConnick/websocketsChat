@@ -85,7 +85,7 @@ const connectSocket = () => {
   if (!connection) alert("uh oh, there's a problem");
 
   connection.onopen = function () {
-      console.log('connecting');
+      log('connecting');
 
       let user = document.querySelector("#username").value;
       let partner = document.querySelector("#partnerName").value;
@@ -94,18 +94,18 @@ const connectSocket = () => {
         user = 'unknown';
       }
 
-	  // the first message establishes the identity of the connected client
-	  let firstMessage = {"name": user, "partner": partner};
+  	  // the first message establishes the identity of the connected client
+  	  let firstMessage = {"name": user, "partner": partner};
 
-	  let deviceToken = undefined;
-	  if (window.Android && window.Android.getIDFromAndroid) {
-		  deviceToken = window.Android.getIDFromAndroid();
-		  if (deviceToken) {
-			     firstMessage = {"name": user, "partner": partner, "deviceToken": deviceToken};
-		  }
-	  } else {
-		  console.log("failed to get device token");
-	  }
+  	  let deviceToken = undefined;
+  	  if (window.Android && window.Android.getIDFromAndroid) {
+  		  deviceToken = window.Android.getIDFromAndroid();
+  		  if (deviceToken) {
+  			     firstMessage = {"name": user, "partner": partner, "deviceToken": deviceToken};
+  		  }
+  	  } else {
+  		  log("failed to get device token");
+  	  }
 
       //socket.emit('join', { name: user });
       connection.send(JSON.stringify(firstMessage));
@@ -121,7 +121,7 @@ const connectSocket = () => {
 
   connection.onerror = function (error) {
     // enter offline mode (debugging only)
-    console.log("offline");
+    log("offline");
     //socket.disconnect();
     offline = true;
     // set user name
@@ -139,12 +139,12 @@ const connectSocket = () => {
     try {
         json = JSON.parse(message.data);
     } catch (e) {
-        console.log('This doesn\'t look like a valid JSON: ', message.data);
+        log('This doesn\'t look like a valid JSON: ', message.data);
         return;
     }
-    console.log(json);
+    log(json);
     if (json.type === "history") {
-      console.log("history recieved");
+      log("history recieved");
       const histArray = json.data[0].messages;
       for (let i=0; i<histArray.length; i++) {
         const obj = JSON.parse(histArray[i]);
@@ -202,6 +202,11 @@ const output = (sourceName, msg) => {
   chat.setState({messages: chat.state.messages.concat([m])});
 };
 
+const log = (logData) => {
+  console.log(logData);
+  let dbg = Document.querySelector("#debug");
+  dbg.innerHTML = dbg.innerHTML + '<br>' + logData;
+}
 
 // ----------------------------------------------
 // Initalization
@@ -251,7 +256,7 @@ const getCookie = (cname) => {
 
 
 // ----------------------------------------------
-// Cavas
+// Canvas
 // ----------------------------------------------
 
 const animationNames = ["blink","cry","love","sleep"];
@@ -503,6 +508,7 @@ class App extends Component {
           <StickerModeButton onClick={() => {this.toggleStickerMenu();}}/>
           <div id="send">send</div>
         </div>
+        <div id="debug"></div>
         <Chat
           // assign the chat variable
           ref={(c) => { chat = c; }}
