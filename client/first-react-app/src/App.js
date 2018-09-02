@@ -495,7 +495,6 @@ class App extends Component {
         <div className="App-header">
           <div>MEOWSSENGER</div>
         </div>
-        <br/>
         <Login />
         <Cats className={this.state.catsClass} />
         <div className={this.state.msgBarClass}>
