@@ -204,7 +204,7 @@ const output = (sourceName, msg) => {
 
 const log = (logData) => {
   console.log(logData);
-  let dbg = Document.querySelector("#debug");
+  let dbg = document.getElementById("debug");
   dbg.innerHTML = dbg.innerHTML + '<br>' + logData;
 }
 
