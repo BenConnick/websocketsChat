@@ -508,6 +508,7 @@ class App extends Component {
           ref={(c) => { chat = c; }}
           className={this.state.chatClass}
         />
+        <div id="fade"></div>
       </div>
     );
   }
